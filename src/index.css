@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    color: #334155; /* Soft Slate 700 to prevent eye strain from harsh black text */
+    background-color: #f8fafc;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #1e293b; /* Gentle Slate 800 for titles instead of harsh black */
+  }
+}

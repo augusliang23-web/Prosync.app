@@ -1,0 +1,6 @@
+{
+  "name": "Executive Project Hub",
+  "description": "多專案進度管理與一級主管AI自動彙整儀表板。提供專案經理簡便的更新介面與一級主管即時的高階戰略視角與簡報摘要。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
