@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Project, HealthStatus, ProjectUpdate } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 import { 
   X, 
   Sparkles, 
@@ -26,6 +27,9 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
   onSubmitUpdate,
 }) => {
   if (!isOpen || !project) return null;
+
+  const { t, language } = useLanguage();
+  const isEn = language === 'en';
 
   const [progress, setProgress] = useState<number>(project.currentProgress);
   const [status, setStatus] = useState<HealthStatus>(project.health);
@@ -55,7 +59,7 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
       });
 
       if (!res.ok) {
-        throw new Error('AI 潤飾服務暫時無法連線');
+        throw new Error(isEn ? 'AI polish service is temporarily unavailable' : 'AI 潤飾服務暫時無法連線');
       }
 
       const data = await res.json();
@@ -73,7 +77,7 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
       setTimeout(() => setPolishedSuccess(false), 3000);
     } catch (err: any) {
       console.error('AI Polish Error:', err);
-      setPolishError(err.message || '潤飾失敗');
+      setPolishError(err.message || (isEn ? 'Polish failed' : '潤飾失敗'));
     } finally {
       setIsPolishing(false);
     }
@@ -98,7 +102,7 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
       pmName: project.leadPm,
       progress: Number(progress),
       status,
-      keyAchievements: achievementsList.length > 0 ? achievementsList : ['專案推進中'],
+      keyAchievements: achievementsList.length > 0 ? achievementsList : [isEn ? 'Project progressing' : '專案推進中'],
       risksAndBlockers: risksText.trim(),
       managementAssistanceNeeded: assistanceText.trim(),
       nextMilestones: milestonesList,
@@ -117,14 +121,14 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
           <div>
             <h3 className="font-bold text-base text-slate-800 flex items-center gap-2">
               <FileEdit className="w-4 h-4 text-slate-700" />
-              核心功能 #4：PM 週報填報 &amp; AI 文案潤飾 - {project.name}
+              {t('updateModal.title')} - {project.name}
             </h3>
-            <p className="text-xs text-slate-500">專案編號：{project.code} | PM：{project.leadPm}</p>
+            <p className="text-xs text-slate-500">{isEn ? `Code: ${project.code} | Lead PM: ${project.leadPm}` : `專案編號：${project.code} | PM：${project.leadPm}`}</p>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -137,7 +141,7 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                當前進度完成率: <span className="text-slate-800 text-sm font-extrabold">{progress}%</span>
+                {t('updateModal.progress')}: <span className="text-slate-800 text-sm font-extrabold">{progress}%</span>
               </label>
               <input
                 type="range"
@@ -151,17 +155,17 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                最新健康狀態 (Health Status)
+                {t('updateModal.healthStatus')}
               </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as HealthStatus)}
                 className="w-full px-3 py-1.5 rounded-lg border border-slate-200/80 text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-slate-400"
               >
-                <option value="ON_TRACK">順利進行 (On Track)</option>
-                <option value="AT_RISK">需要關注 (At Risk)</option>
-                <option value="DELAYED">嚴重落後 (Delayed)</option>
-                <option value="COMPLETED">已完成 (Completed)</option>
+                <option value="ON_TRACK">{t('health.ON_TRACK')}</option>
+                <option value="AT_RISK">{t('health.AT_RISK')}</option>
+                <option value="DELAYED">{t('health.DELAYED')}</option>
+                <option value="COMPLETED">{t('health.COMPLETED')}</option>
               </select>
             </div>
           </div>
@@ -171,7 +175,7 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-slate-600 shrink-0" />
               <span className="text-xs text-slate-700 font-medium">
-                口語化草稿？點擊 AI 幫您一鍵精煉成專業高層簡報文案
+                {isEn ? 'Have rough notes? Click AI to polish into a C-suite ready briefing' : '口語化草稿？點擊 AI 幫您一鍵精煉成專業高層簡報文案'}
               </span>
             </div>
 
@@ -179,16 +183,16 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
               type="button"
               onClick={handlePolishWithAI}
               disabled={isPolishing}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-100 shadow-2xs transition-all disabled:opacity-50 shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-100 shadow-2xs transition-all disabled:opacity-50 shrink-0 cursor-pointer"
             >
               {isPolishing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-slate-300" />}
-              <span>{isPolishing ? '潤飾中...' : '✨ AI 潤飾文案'}</span>
+              <span>{isPolishing ? t('updateModal.aiPolishing') : `✨ ${t('updateModal.aiPolish')}`}</span>
             </button>
           </div>
 
           {polishedSuccess && (
             <div className="p-2.5 bg-emerald-50 text-emerald-800 text-xs rounded-lg border border-emerald-200/80 flex items-center gap-1.5 font-medium">
-              <Check className="w-4 h-4 text-emerald-600" /> 已成功將草稿文字精煉整理完成！
+              <Check className="w-4 h-4 text-emerald-600" /> {isEn ? 'Successfully polished notes with AI!' : '已成功將草稿文字精煉整理完成！'}
             </div>
           )}
 
@@ -201,11 +205,11 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
           {/* Key Achievements Input */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-              <Trophy className="w-3.5 h-3.5 text-emerald-600" /> 本週成果與重要突破 (一行一項)
+              <Trophy className="w-3.5 h-3.5 text-emerald-600" /> {t('updateModal.achievements')}
             </label>
             <textarea
               rows={3}
-              placeholder="例如：完成第二階段壓測，延遲下降 30%..."
+              placeholder={t('updateModal.achievementsPlaceholder')}
               value={achievementsText}
               onChange={(e) => setAchievementsText(e.target.value)}
               className="w-full p-3 rounded-xl border border-slate-200/80 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 placeholder-slate-400"
@@ -215,11 +219,11 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
           {/* Risks and Blockers Input */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-600" /> 當前遭遇之風險與阻礙原因
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-600" /> {t('updateModal.blockers')}
             </label>
             <textarea
               rows={2}
-              placeholder="例如：舊版系統資料對接複雜，進度落後 1 週..."
+              placeholder={t('updateModal.blockersPlaceholder')}
               value={risksText}
               onChange={(e) => setRisksText(e.target.value)}
               className="w-full p-3 rounded-xl border border-slate-200/80 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 placeholder-slate-400"
@@ -229,11 +233,11 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
           {/* Assistance Needed Input */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-              <HelpCircle className="w-3.5 h-3.5 text-slate-600" /> 需要主管/高層協助之事項
+              <HelpCircle className="w-3.5 h-3.5 text-slate-600" /> {t('updateModal.assistance')}
             </label>
             <textarea
               rows={2}
-              placeholder="例如：請協助調配 1 名 DBA 支援關聯資料對帳..."
+              placeholder={t('updateModal.assistancePlaceholder')}
               value={assistanceText}
               onChange={(e) => setAssistanceText(e.target.value)}
               className="w-full p-3 rounded-xl border border-slate-200/80 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 placeholder-slate-400"
@@ -243,11 +247,11 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
           {/* Next Milestones Input */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              下週預計推進里程碑 (一行一項)
+              {isEn ? 'Next Milestones / Target Goals (1 per line)' : '下週預計推進里程碑 (一行一項)'}
             </label>
             <textarea
               rows={2}
-              placeholder="例如：展開跨部門 UAT 測試..."
+              placeholder={isEn ? 'e.g., Begin cross-departmental UAT testing...' : '例如：展開跨部門 UAT 測試...'}
               value={nextMilestonesText}
               onChange={(e) => setNextMilestonesText(e.target.value)}
               className="w-full p-3 rounded-xl border border-slate-200/80 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 placeholder-slate-400"
@@ -259,16 +263,16 @@ export const PMUpdateModal: React.FC<PMUpdateModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              取消
+              {t('updateModal.cancel')}
             </button>
 
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-100 shadow-2xs transition-all"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-100 shadow-2xs transition-all cursor-pointer"
             >
-              <Send className="w-3.5 h-3.5" /> 提交 PM 週報更新
+              <Send className="w-3.5 h-3.5" /> {t('updateModal.submit')}
             </button>
           </div>
 

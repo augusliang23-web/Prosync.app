@@ -32,7 +32,8 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   onOpenAddProject,
   onOpenEditProject,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isEn = language === 'en';
   const [viewMode, setViewMode] = useState<ViewMode>('GRID');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDept, setSelectedDept] = useState<string>('ALL');
@@ -143,12 +144,12 @@ export const ProjectList: React.FC<ProjectListProps> = ({
               className="px-2.5 py-1.5 rounded-lg border border-slate-200/80 bg-slate-50/50 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400"
             >
               <option value="ALL">{t('dashboard.allDepts')}</option>
-              <option value="研發部">研發部</option>
-              <option value="IT資訊部">IT資訊部</option>
-              <option value="行銷部">行銷部</option>
-              <option value="營運部">營運部</option>
-              <option value="永續營運部">永續營運部</option>
-              <option value="產品部">產品部</option>
+              <option value="研發部">{isEn ? 'R&D Dept' : '研發部'}</option>
+              <option value="IT資訊部">{isEn ? 'IT & Infra Dept' : 'IT資訊部'}</option>
+              <option value="行銷部">{isEn ? 'Marketing Dept' : '行銷部'}</option>
+              <option value="營運部">{isEn ? 'Operations Dept' : '營運部'}</option>
+              <option value="永續營運部">{isEn ? 'Sustainability Dept' : '永續營運部'}</option>
+              <option value="產品部">{isEn ? 'Product Dept' : '產品部'}</option>
             </select>
 
             <select
@@ -156,11 +157,11 @@ export const ProjectList: React.FC<ProjectListProps> = ({
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="px-2.5 py-1.5 rounded-lg border border-slate-200/80 bg-slate-50/50 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400"
             >
-              <option value="ALL">所有健康狀態</option>
-              <option value="ON_TRACK">順利進行</option>
-              <option value="AT_RISK">需要關注</option>
-              <option value="DELAYED">嚴重落後</option>
-              <option value="COMPLETED">已完成</option>
+              <option value="ALL">{t('dashboard.allStatus')}</option>
+              <option value="ON_TRACK">{t('health.ON_TRACK')}</option>
+              <option value="AT_RISK">{t('health.AT_RISK')}</option>
+              <option value="DELAYED">{t('health.DELAYED')}</option>
+              <option value="COMPLETED">{t('health.COMPLETED')}</option>
             </select>
           </div>
         </div>
@@ -209,20 +210,20 @@ export const ProjectList: React.FC<ProjectListProps> = ({
 
                   <div className="mt-3 grid grid-cols-2 gap-2 text-xs p-2 bg-slate-50/70 rounded-lg border border-slate-100">
                     <div>
-                      <span className="text-slate-400 text-[10px] block">劃算總預算</span>
+                      <span className="text-slate-400 text-[10px] block">{isEn ? 'Total Budget' : '劃算總預算'}</span>
                       <span className="font-semibold font-mono text-slate-800">
                         {formatCurrency(p.totalBudget, p.currency || 'TWD')}
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-400 text-[10px] block">最後更新</span>
+                      <span className="text-slate-400 text-[10px] block">{isEn ? 'Last Updated' : '最後更新'}</span>
                       <span className="font-semibold text-slate-800">{p.updatedAt}</span>
                     </div>
                   </div>
 
                   {latestUpdate && (
                     <div className="mt-2.5 p-2 rounded-lg bg-slate-100/70 border border-slate-200/60 text-xs">
-                      <div className="font-semibold text-slate-800 mb-0.5">最新週報重點：</div>
+                      <div className="font-semibold text-slate-800 mb-0.5">{isEn ? 'Latest Update:' : '最新週報重點：'}</div>
                       <p className="text-slate-600 line-clamp-2">{latestUpdate.risksAndBlockers || latestUpdate.keyAchievements[0]}</p>
                     </div>
                   )}
@@ -234,10 +235,10 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                       <button
                         onClick={() => onOpenEditProject(p)}
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all cursor-pointer"
-                        title="編輯專案名稱、預算、進度與里程碑"
+                        title={isEn ? "Edit project details, budget, progress, and milestones" : "編輯專案名稱、預算、進度與里程碑"}
                       >
                         <FileEdit className="w-3.5 h-3.5" />
-                        <span>編輯專案</span>
+                        <span>{isEn ? 'Edit' : '編輯專案'}</span>
                       </button>
                     )}
 
@@ -245,7 +246,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                       onClick={() => onOpenLogUpdate(p)}
                       className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-100 shadow-2xs transition-all cursor-pointer"
                     >
-                      <span>填寫週報</span>
+                      <span>{isEn ? 'Log Update' : '填寫週報'}</span>
                     </button>
                   </div>
 
@@ -253,7 +254,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                     onClick={() => onSelectProject(p.id)}
                     className="text-xs font-semibold text-slate-600 hover:text-indigo-600 flex items-center gap-0.5 cursor-pointer"
                   >
-                    里程碑查核 <ArrowUpRight className="w-3.5 h-3.5" />
+                    {isEn ? 'Details & Milestones' : '里程碑查核'} <ArrowUpRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -269,14 +270,14 @@ export const ProjectList: React.FC<ProjectListProps> = ({
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
                 <tr>
-                  <th className="p-3">專案編號/名稱</th>
-                  <th className="p-3">部門</th>
-                  <th className="p-3">負責 PM</th>
-                  <th className="p-3">健康狀態</th>
-                  <th className="p-3">進度 %</th>
-                  <th className="p-3">實支 / 總預算</th>
-                  <th className="p-3">預計完工日</th>
-                  <th className="p-3 text-right">操作</th>
+                  <th className="p-3">{isEn ? 'Code / Name' : '專案編號/名稱'}</th>
+                  <th className="p-3">{isEn ? 'Department' : '部門'}</th>
+                  <th className="p-3">{isEn ? 'Lead PM' : '負責 PM'}</th>
+                  <th className="p-3">{isEn ? 'Health' : '健康狀態'}</th>
+                  <th className="p-3">{isEn ? 'Progress %' : '進度 %'}</th>
+                  <th className="p-3">{isEn ? 'Spent / Budget' : '實支 / 總預算'}</th>
+                  <th className="p-3">{isEn ? 'Target Date' : '預計完工日'}</th>
+                  <th className="p-3 text-right">{isEn ? 'Actions' : '操作'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -307,20 +308,20 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                             onClick={() => onOpenEditProject(p)}
                             className="px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200"
                           >
-                            編輯專案
+                            {isEn ? 'Edit' : '編輯專案'}
                           </button>
                         )}
                         <button
                           onClick={() => onOpenLogUpdate(p)}
                           className="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-100"
                         >
-                          週報
+                          {isEn ? 'Log' : '週報'}
                         </button>
                         <button
                           onClick={() => onSelectProject(p.id)}
                           className="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700"
                         >
-                          里程碑
+                          {isEn ? 'Milestones' : '里程碑'}
                         </button>
                       </div>
                     </td>
@@ -373,7 +374,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                           }}
                           className="text-slate-700 font-bold hover:underline"
                         >
-                          + 填寫週報
+                          + {isEn ? 'Log Update' : '填寫週報'}
                         </button>
                       </div>
                     </div>
@@ -381,7 +382,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
 
                   {colProjects.length === 0 && (
                     <div className="text-center py-6 text-xs text-slate-400 border border-dashed border-slate-300 rounded-lg">
-                      此狀態尚無專案
+                      {isEn ? 'No projects in this status' : '此狀態尚無專案'}
                     </div>
                   )}
                 </div>

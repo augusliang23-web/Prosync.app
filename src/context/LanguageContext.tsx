@@ -362,7 +362,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
     }
     const saved = localStorage.getItem('prosync_language');
-    return saved === 'en' ? 'en' : 'zh';
+    return saved === 'zh' ? 'zh' : 'en';
   });
 
   const setLanguage = (lang: Language) => {

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Project, HealthStatus } from '../../types';
 import { generateWeeklyTrendData, WeeklyDataPoint } from '../../utils/trendDataGenerator';
+import { useLanguage } from '../../context/LanguageContext';
 import { 
   ResponsiveContainer, 
   AreaChart, 
@@ -36,6 +37,8 @@ interface WeeklyTrendChartProps {
 }
 
 export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, onSelectProject }) => {
+  const { language } = useLanguage();
+  const isEn = language === 'en';
   const [timeframe, setTimeframe] = useState<12 | 24>(24);
   const [chartType, setChartType] = useState<'HEALTH' | 'PROGRESS_BUDGET'>('HEALTH');
   const [selectedWeek, setSelectedWeek] = useState<WeeklyDataPoint | null>(null);
@@ -58,13 +61,13 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
           </div>
           <div>
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <span>高層專案推移圖表：過去 {timeframe} 週狀態與進度軌跡</span>
+              <span>{isEn ? `Executive Trend Chart: Past ${timeframe} Weeks Trajectory` : `高層專案推移圖表：過去 ${timeframe} 週狀態與進度軌跡`}</span>
               <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-mono font-semibold border border-indigo-200">
                 12~24 Weeks Trend
               </span>
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              動態追蹤全公司專案健康狀態分佈 (On Track / At Risk / Delayed)、平均達成率與預算消耗趨勢
+              {isEn ? 'Dynamically track portfolio health distribution (On Track / At Risk / Delayed), average completion rate, and budget burn rate.' : '動態追蹤全公司專案健康狀態分佈 (On Track / At Risk / Delayed)、平均達成率與預算消耗趨勢'}
             </p>
           </div>
         </div>
@@ -81,7 +84,7 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
                   : 'hover:text-slate-900'
               }`}
             >
-              健康狀態分佈
+              {isEn ? 'Health Status' : '健康狀態分佈'}
             </button>
             <button
               onClick={() => setChartType('PROGRESS_BUDGET')}
@@ -91,7 +94,7 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
                   : 'hover:text-slate-900'
               }`}
             >
-              進度與預算速率
+              {isEn ? 'Progress & Budget Velocity' : '進度與預算速率'}
             </button>
           </div>
 
@@ -106,7 +109,7 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
                 timeframe === 12 ? 'bg-indigo-600 text-white font-bold shadow-2xs' : 'hover:text-slate-900'
               }`}
             >
-              12 週
+              {isEn ? '12 Wks' : '12 週'}
             </button>
             <button
               onClick={() => {
@@ -117,7 +120,7 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
                 timeframe === 24 ? 'bg-indigo-600 text-white font-bold shadow-2xs' : 'hover:text-slate-900'
               }`}
             >
-              24 週
+              {isEn ? '24 Wks' : '24 週'}
             </button>
           </div>
         </div>
@@ -162,10 +165,10 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
                 labelStyle={{ fontWeight: 'bold', color: '#0f172a' }}
               />
               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-              <Area type="monotone" dataKey="onTrack" name="🟢 綠燈正常" stackId="1" stroke="#10b981" fill="url(#colorOnTrack)" />
-              <Area type="monotone" dataKey="atRisk" name="🟡 黃燈注意" stackId="1" stroke="#f59e0b" fill="url(#colorAtRisk)" />
-              <Area type="monotone" dataKey="delayed" name="🔴 紅燈延遲" stackId="1" stroke="#ef4444" fill="url(#colorDelayed)" />
-              <Area type="monotone" dataKey="completed" name="🔵 順利完工" stackId="1" stroke="#3b82f6" fill="url(#colorCompleted)" />
+              <Area type="monotone" dataKey="onTrack" name={isEn ? "🟢 On Track" : "🟢 綠燈正常"} stackId="1" stroke="#10b981" fill="url(#colorOnTrack)" />
+              <Area type="monotone" dataKey="atRisk" name={isEn ? "🟡 At Risk" : "🟡 黃燈注意"} stackId="1" stroke="#f59e0b" fill="url(#colorAtRisk)" />
+              <Area type="monotone" dataKey="delayed" name={isEn ? "🔴 Delayed" : "🔴 紅燈延遲"} stackId="1" stroke="#ef4444" fill="url(#colorDelayed)" />
+              <Area type="monotone" dataKey="completed" name={isEn ? "🔵 Completed" : "🔵 順利完工"} stackId="1" stroke="#3b82f6" fill="url(#colorCompleted)" />
             </AreaChart>
           ) : (
             <ComposedChart
@@ -186,8 +189,8 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
                 labelStyle={{ fontWeight: 'bold', color: '#0f172a' }}
               />
               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-              <Bar yAxisId="right" dataKey="totalSpentBudgetM" name="預算累計消耗 ($M TWD)" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
-              <Line yAxisId="left" type="monotone" dataKey="avgProgress" name="全公司平均完成率 (%)" stroke="#4f46e5" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 6 }} />
+              <Bar yAxisId="right" dataKey="totalSpentBudgetM" name={isEn ? "Cumulative Budget Spent ($M TWD)" : "預算累計消耗 ($M TWD)"} fill="#cbd5e1" radius={[4, 4, 0, 0]} />
+              <Line yAxisId="left" type="monotone" dataKey="avgProgress" name={isEn ? "Portfolio Avg Progress (%)" : "全公司平均完成率 (%)"} stroke="#4f46e5" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 6 }} />
             </ComposedChart>
           )}
         </ResponsiveContainer>
@@ -202,22 +205,22 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
                 {activeWeek.weekLabel}
               </span>
               <span className="text-xs font-bold text-slate-800">
-                對應日期：{activeWeek.dateStr} 週報時間點
+                {isEn ? `Date: ${activeWeek.dateStr} Weekly Report Point` : `對應日期：${activeWeek.dateStr} 週報時間點`}
               </span>
             </div>
 
             <div className="flex items-center gap-3 text-xs font-medium">
               <span className="flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                正常: <strong>{activeWeek.onTrack}</strong>
+                {isEn ? 'Normal:' : '正常:'} <strong>{activeWeek.onTrack}</strong>
               </span>
               <span className="flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                注意: <strong>{activeWeek.atRisk}</strong>
+                {isEn ? 'At Risk:' : '注意:'} <strong>{activeWeek.atRisk}</strong>
               </span>
               <span className="flex items-center gap-1 text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                延遲: <strong>{activeWeek.delayed}</strong>
+                {isEn ? 'Delayed:' : '延遲:'} <strong>{activeWeek.delayed}</strong>
               </span>
               <span className="flex items-center gap-1 text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 font-mono">
-                完成率: <strong>{activeWeek.avgProgress}%</strong>
+                {isEn ? 'Completion:' : '完成率:'} <strong>{activeWeek.avgProgress}%</strong>
               </span>
             </div>
           </div>
@@ -227,11 +230,13 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
             <div className="bg-white p-3 rounded-xl border border-slate-200/80 space-y-1.5">
               <span className="font-bold text-slate-700 block text-xs flex items-center gap-1.5">
                 <Activity className="w-3.5 h-3.5 text-indigo-600" />
-                <span>該週專案狀態轉變紀錄 (Status Shifts)</span>
+                <span>{isEn ? 'Weekly Status Shift Records' : '該週專案狀態轉變紀錄 (Status Shifts)'}</span>
               </span>
 
               {activeWeek.statusChanges.length === 0 ? (
-                <p className="text-slate-400 text-xs italic pt-1">該週無重大狀態升降級變化，各專案健康狀況平穩運作。</p>
+                <p className="text-slate-400 text-xs italic pt-1">
+                  {isEn ? 'No status shifts recorded this week. Portfolio health remains stable.' : '該週無重大狀態升降級變化，各專案健康狀況平穩運作。'}
+                </p>
               ) : (
                 activeWeek.statusChanges.map((sc, i) => (
                   <div key={i} className="p-2 rounded bg-amber-50/70 border border-amber-200/80 space-y-1">
@@ -251,11 +256,13 @@ export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ projects, on
             <div className="bg-white p-3 rounded-xl border border-slate-200/80 space-y-1.5">
               <span className="font-bold text-slate-700 block text-xs flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                <span>關鍵里程碑與高層管理事件 (Milestone Events)</span>
+                <span>{isEn ? 'Key Milestones & Executive Events' : '關鍵里程碑與高層管理事件 (Milestone Events)'}</span>
               </span>
 
               {activeWeek.events.length === 0 ? (
-                <p className="text-slate-400 text-xs italic pt-1">該週按原定基線進度執行，無高層特准變更案。</p>
+                <p className="text-slate-400 text-xs italic pt-1">
+                  {isEn ? 'Current report complies with baseline schedule. Latest executive approvals active.' : '當前最新週報彙整完成，高層簽核關卡防護生效中'}
+                </p>
               ) : (
                 activeWeek.events.map((evt, i) => (
                   <div key={i} className="p-2 rounded bg-slate-50 border border-slate-200 text-slate-700 flex items-start gap-2">

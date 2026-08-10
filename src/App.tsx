@@ -108,10 +108,13 @@ export default function App() {
     return localStorage.getItem('prosync_sidebar_collapsed') === 'true';
   });
 
-  // Brand Logo Variant state (3 Options)
+  // Brand Logo Variant state (ProSync Ribbon P by default)
   const [logoVariant, setLogoVariant] = useState<LogoVariant>(() => {
-    const saved = localStorage.getItem('prosync_logo_variant');
-    return (saved === 'diamond' || saved === 'pulse') ? saved : 'mesh';
+    const saved = localStorage.getItem('prosync_logo_variant_v2');
+    if (saved && ['prosync', 'mesh', 'diamond', 'pulse'].includes(saved)) {
+      return saved as LogoVariant;
+    }
+    return 'prosync';
   });
   const [isLogoSelectorOpen, setIsLogoSelectorOpen] = useState(false);
 
@@ -489,6 +492,7 @@ export default function App() {
                 onOpenEditProject={(p) => setEditingProject(p)}
                 onReviewMilestoneRequest={handleReviewMilestoneRequest}
                 onOpenApprovalGateway={() => setIsApprovalGatewayOpen(true)}
+                onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
               />
             ) : (
               <ProjectList
@@ -523,6 +527,7 @@ export default function App() {
         currentVariant={logoVariant}
         onSelectVariant={(variant) => {
           setLogoVariant(variant);
+          localStorage.setItem('prosync_logo_variant_v2', variant);
           setIsLogoSelectorOpen(false);
         }}
       />

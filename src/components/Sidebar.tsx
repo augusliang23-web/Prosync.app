@@ -150,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div>
             {!isCollapsed && (
               <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider pb-1.5 px-2">
-                核心模組 (System Views)
+                {language === 'en' ? 'System Views' : '核心模組 (System Views)'}
               </div>
             )}
 
@@ -161,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onViewChange('PROJECTS');
                   onCloseMobile();
                 }}
-                title={isCollapsed ? "專案管理總覽" : undefined}
+                title={isCollapsed ? (language === 'en' ? 'Projects Portfolio' : '專案管理總覽') : undefined}
                 className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5'} rounded-xl text-xs font-medium transition-all cursor-pointer ${
                   currentView === 'PROJECTS'
                     ? 'bg-indigo-600 text-white font-semibold shadow-xs'
@@ -170,7 +170,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <div className="flex items-center gap-2.5">
                   <LayoutDashboard className={`w-4 h-4 ${currentView === 'PROJECTS' ? 'text-white' : 'text-slate-400'}`} />
-                  {!isCollapsed && <span>專案管理與儀表板</span>}
+                  {!isCollapsed && <span>{language === 'en' ? 'Projects & Portfolio' : '專案管理與儀表板'}</span>}
                 </div>
                 {!isCollapsed && totalAlerts > 0 && (
                   <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
@@ -185,7 +185,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onViewChange('ORG_STRUCTURE');
                   onCloseMobile();
                 }}
-                title={isCollapsed ? "組織架構與人員管理" : undefined}
+                title={isCollapsed ? (language === 'en' ? 'Org Architecture & HR' : '組織架構與人員管理') : undefined}
                 className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5'} rounded-xl text-xs font-medium transition-all cursor-pointer ${
                   currentView === 'ORG_STRUCTURE'
                     ? 'bg-indigo-600 text-white font-semibold shadow-xs'
@@ -194,7 +194,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <div className="flex items-center gap-2.5">
                   <Users className={`w-4 h-4 ${currentView === 'ORG_STRUCTURE' ? 'text-white' : 'text-slate-400'}`} />
-                  {!isCollapsed && <span>組織架構與人員管理</span>}
+                  {!isCollapsed && <span>{language === 'en' ? 'Org Architecture & HR' : '組織架構與人員管理'}</span>}
                 </div>
                 {!isCollapsed && (
                   <span className="px-1.5 py-0.5 rounded bg-slate-800 text-indigo-300 text-[9px] font-mono font-bold">
@@ -209,15 +209,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {!isCollapsed && (
             <div>
               <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider pb-1.5 px-2">
-                當前角色身份 (Role Perspective)
+                {language === 'en' ? 'Role Perspective' : '當前角色身份 (Role Perspective)'}
               </div>
 
               <div className="space-y-1 bg-slate-800/40 p-1.5 rounded-xl border border-slate-800">
                 {[
-                  { id: 'EXECUTIVE', label: 'C-Suite 高層主管', icon: HeartHandshake, badge: '全覽審核' },
-                  { id: 'N1_MANAGER', label: 'N-1 部門主管', icon: Shield, badge: '部門審核' },
-                  { id: 'HR_MANAGER', label: 'HR 人力資源主管', icon: UserCheck, badge: '組織維護' },
-                  { id: 'PM', label: '專案經理 (PM)', icon: FolderGit2, badge: '專案執行' },
+                  { id: 'EXECUTIVE', label: language === 'en' ? 'C-Suite Executive' : 'C-Suite 高層主管', icon: HeartHandshake, badge: language === 'en' ? 'Full Review' : '全覽審核' },
+                  { id: 'N1_MANAGER', label: language === 'en' ? 'N-1 Dept Manager' : 'N-1 部門主管', icon: Shield, badge: language === 'en' ? 'Dept Review' : '部門審核' },
+                  { id: 'HR_MANAGER', label: language === 'en' ? 'HR Manager' : 'HR 人力資源主管', icon: UserCheck, badge: language === 'en' ? 'Org Admin' : '組織維護' },
+                  { id: 'PM', label: language === 'en' ? 'Project Manager (PM)' : '專案經理 (PM)', icon: FolderGit2, badge: language === 'en' ? 'Execution' : '專案執行' },
                 ].map((role) => {
                   const Icon = role.icon;
                   const isSelected = currentRole === role.id;

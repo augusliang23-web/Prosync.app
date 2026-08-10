@@ -40,6 +40,7 @@ interface ExecutiveDashboardProps {
   onOpenEditProject?: (project: Project) => void;
   onReviewMilestoneRequest?: (projectId: string, requestId: string, action: 'APPROVE' | 'REJECT', comment?: string) => void;
   onOpenApprovalGateway?: () => void;
+  onOpenLinkedInModal?: () => void;
 }
 
 export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
@@ -51,8 +52,10 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   onOpenEditProject,
   onReviewMilestoneRequest,
   onOpenApprovalGateway,
+  onOpenLinkedInModal,
 }) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
+  const isEn = language === 'en';
   const [selectedDepartment, setSelectedDepartment] = useState<string>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -139,7 +142,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           {/* Executive Currency Switcher */}
           <div className="flex items-center gap-2 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80">
             <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1 pl-2">
-              <Globe className="w-3.5 h-3.5 text-slate-500" /> 主管檢討匯率幣別：
+              <Globe className="w-3.5 h-3.5 text-slate-500" /> {isEn ? 'Executive Currency:' : '主管檢討匯率幣別：'}
             </span>
             <div className="flex items-center gap-1">
               {CURRENCY_LIST.map((c) => (
@@ -196,7 +199,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
               {formatCurrency(budgetSummary.totalSpentInTargetCurrency, executiveCurrency)}
             </div>
             <div className="text-[11px] text-slate-500 font-medium mt-1 font-mono">
-              總預算: {formatCurrency(budgetSummary.totalBudgetInTargetCurrency, executiveCurrency)} ({budgetSummary.overallBudgetRatio}%)
+              {isEn ? 'Budget:' : '總預算:'} {formatCurrency(budgetSummary.totalBudgetInTargetCurrency, executiveCurrency)} ({budgetSummary.overallBudgetRatio}%)
             </div>
           </div>
 
@@ -224,7 +227,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             <Building2 className="w-4 h-4 text-slate-600" /> {t('dashboard.deptPulse')}
           </h2>
           <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded">
-            換算幣別：{CURRENCIES[executiveCurrency].name} ({executiveCurrency})
+            {isEn ? 'Currency:' : '換算幣別：'}{CURRENCIES[executiveCurrency].name} ({executiveCurrency})
           </span>
         </div>
 
@@ -262,8 +265,8 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
               </div>
 
               <div className="mt-2 pt-1.5 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-slate-500 font-mono">
-                <span>實支: {formatCurrency(dept.totalSpentInTarget, executiveCurrency, true)}</span>
-                <span>總預算: {formatCurrency(dept.totalBudgetInTarget, executiveCurrency, true)}</span>
+                <span>{isEn ? 'Spent:' : '實支:'} {formatCurrency(dept.totalSpentInTarget, executiveCurrency, true)}</span>
+                <span>{isEn ? 'Budget:' : '總預算:'} {formatCurrency(dept.totalBudgetInTarget, executiveCurrency, true)}</span>
               </div>
             </div>
           ))}
@@ -286,19 +289,19 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
               </span>
               <div>
                 <h3 className="text-sm font-bold text-amber-950 flex items-center gap-2">
-                  <span>部門 N-1 / 高層簽核關卡：待核准專案立項與里程碑變更 (Approval Gateway)</span>
+                  <span>{isEn ? 'Department N-1 / Approval Gateway: Pending Baseline & Milestone Changes' : '部門 N-1 / 高層簽核關卡：待核准專案立項與里程碑變更 (Approval Gateway)'}</span>
                   <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-xs font-mono font-bold">
-                    {allPendingRequests.length} 筆待簽核
+                    {allPendingRequests.length} {isEn ? 'Pending' : '筆待簽核'}
                   </span>
                 </h3>
                 <p className="text-xs text-amber-800">
-                  依據組織架構授權，專案立項與里程碑異動均自動陳核至 **N-1 部門主管關卡**（無需簽核至 CEO），經核准後方可更動。
+                  {isEn ? 'Authorized by org structure, project baseline and milestone changes auto-route to N-1 Dept Heads for approval.' : '依據組織架構授權，專案立項與里程碑異動均自動陳核至 N-1 部門主管關卡，經核准後方可更動。'}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-amber-800 font-mono hidden lg:flex items-center gap-1 font-semibold">
-                <Lock className="w-3.5 h-3.5 text-amber-600" /> 基線防護機制生效中
+                <Lock className="w-3.5 h-3.5 text-amber-600" /> {isEn ? 'Baseline Protection Active' : '基線防護機制生效中'}
               </span>
 
               {onOpenApprovalGateway && (
@@ -307,7 +310,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer animate-pulse"
                 >
                   <FileCheck2 className="w-4 h-4" />
-                  <span>進入高層專用簽核關卡</span>
+                  <span>{isEn ? 'Open Approval Gateway' : '進入高層專用簽核關卡'}</span>
                 </button>
               )}
             </div>
@@ -321,46 +324,50 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                     {project.name} ({project.code})
                   </span>
                   <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
-                    {req.changeType === 'ADD' ? '新增里程碑' : req.changeType === 'MODIFY_DATE' ? '展延/改期' : '申請刪除'}
+                    {req.changeType === 'ADD' 
+                      ? (isEn ? 'Add Milestone' : '新增里程碑') 
+                      : req.changeType === 'MODIFY_DATE' 
+                      ? (isEn ? 'Extend Date' : '展延/改期') 
+                      : (isEn ? 'Delete Request' : '申請刪除')}
                   </span>
                 </div>
 
                 <div className="bg-slate-50 p-2 rounded border border-slate-200/80 space-y-1">
                   <div className="font-semibold text-slate-800">
-                    標的：{req.newTitle}
+                    {isEn ? 'Target:' : '標的：'}{req.newTitle}
                   </div>
                   {req.originalDueDate && req.originalDueDate !== req.newDueDate && (
                     <div className="text-[11px] text-slate-500 font-mono">
-                      日期調整：<span className="line-through">{req.originalDueDate}</span> &rarr; <span className="text-amber-700 font-bold">{req.newDueDate}</span>
+                      {isEn ? 'Date Shift:' : '日期調整：'}<span className="line-through">{req.originalDueDate}</span> &rarr; <span className="text-amber-700 font-bold">{req.newDueDate}</span>
                     </div>
                   )}
                   {req.changeType === 'ADD' && (
                     <div className="text-[11px] text-slate-500 font-mono">
-                      預定完成日：<span className="text-indigo-700 font-bold">{req.newDueDate}</span>
+                      {isEn ? 'Target Date:' : '預定完成日：'}<span className="text-indigo-700 font-bold">{req.newDueDate}</span>
                     </div>
                   )}
                   <div className="text-slate-600 text-[11px] pt-1">
-                    <strong className="text-slate-700">變更理由：</strong> {req.reason}
+                    <strong className="text-slate-700">{isEn ? 'Reason:' : '變更理由：'}</strong> {req.reason}
                   </div>
                   <div className="text-[10px] text-slate-400 pt-0.5 font-mono flex items-center justify-between">
-                    <span>提報 PM：{req.pmName}</span>
-                    <span>時間：{req.requestedAt}</span>
+                    <span>{isEn ? 'Submitted by:' : '提報 PM：'}{req.pmName}</span>
+                    <span>{isEn ? 'Time:' : '時間：'}{req.requestedAt}</span>
                   </div>
                 </div>
 
                 {onReviewMilestoneRequest && (
                   <div className="flex items-center justify-end gap-2 pt-1">
                     <button
-                      onClick={() => onReviewMilestoneRequest(project.id, req.id, 'REJECT', '高層審核退回')}
+                      onClick={() => onReviewMilestoneRequest(project.id, req.id, 'REJECT', isEn ? 'Rejected by Executive' : '高層審核退回')}
                       className="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs flex items-center gap-1 transition-colors"
                     >
-                      <Ban className="w-3.5 h-3.5 text-rose-500" /> 退回申請
+                      <Ban className="w-3.5 h-3.5 text-rose-500" /> {isEn ? 'Reject' : '退回申請'}
                     </button>
                     <button
-                      onClick={() => onReviewMilestoneRequest(project.id, req.id, 'APPROVE', '高層審核核准')}
+                      onClick={() => onReviewMilestoneRequest(project.id, req.id, 'APPROVE', isEn ? 'Approved by Executive' : '高層審核核准')}
                       className="px-3.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition-colors"
                     >
-                      <Check className="w-3.5 h-3.5" /> 核准並更新基線
+                      <Check className="w-3.5 h-3.5" /> {isEn ? 'Approve & Update Baseline' : '核准並更新基線'}
                     </button>
                   </div>
                 )}
@@ -406,12 +413,12 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
               className="px-2.5 py-1 rounded-lg border border-slate-200/80 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:ring-1 focus:ring-slate-400"
             >
               <option value="ALL">{t('dashboard.allDepts')}</option>
-              <option value="研發部">研發部</option>
-              <option value="IT資訊部">IT資訊部</option>
-              <option value="行銷部">行銷部</option>
-              <option value="營運部">營運部</option>
-              <option value="永續營運部">永續營運部</option>
-              <option value="產品部">產品部</option>
+              <option value="研發部">{isEn ? 'R&D Dept' : '研發部'}</option>
+              <option value="IT資訊部">{isEn ? 'IT & Infra Dept' : 'IT資訊部'}</option>
+              <option value="行銷部">{isEn ? 'Marketing Dept' : '行銷部'}</option>
+              <option value="營運部">{isEn ? 'Operations Dept' : '營運部'}</option>
+              <option value="永續營運部">{isEn ? 'Sustainability Dept' : '永續營運部'}</option>
+              <option value="產品部">{isEn ? 'Product Dept' : '產品部'}</option>
             </select>
 
             <select

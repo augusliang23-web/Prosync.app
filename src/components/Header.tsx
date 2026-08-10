@@ -79,7 +79,9 @@ export const Header: React.FC<HeaderProps> = ({
             title="查看待高層簽核之專案里程碑申請"
           >
             <FileCheck2 className="w-4 h-4 text-slate-950 shrink-0" />
-            <span className="hidden md:inline font-bold">高層簽核關卡</span>
+            <span className="hidden md:inline font-bold">
+              {language === 'en' ? 'Approvals' : '高層簽核關卡'}
+            </span>
             <span className="px-1.5 py-0.5 rounded-full bg-slate-950 text-amber-400 text-[11px] font-mono font-black">
               {pendingApprovalsCount}
             </span>

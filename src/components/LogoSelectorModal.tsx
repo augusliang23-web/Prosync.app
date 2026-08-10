@@ -19,10 +19,17 @@ export const LogoSelectorModal: React.FC<LogoSelectorModalProps> = ({
 
   const options: { id: LogoVariant; name: string; titleEn: string; desc: string; highlights: string[] }[] = [
     {
+      id: 'prosync',
+      name: 'ProSync 旗艦標誌 (Official Ribbon P)',
+      titleEn: 'Official ProSync Purple Ribbon Mark',
+      desc: '流線漸變 P 字標誌，呈現企業級 AI 專案進度整合平台之現代與流暢識別。',
+      highlights: ['官方 2026 ProSync 旗艦圖標', '紫靛動態漸變 Ribbon 造型', '極致高辨識度與專業質感'],
+    },
+    {
       id: 'mesh',
       name: '戰略節點網格 (Prism Mesh)',
       titleEn: 'Enterprise Strategic Prism Mesh',
-      desc: '雙色重疊多邊形與數據節點，象徵跨部門專案高度交織、即時共振與全方位掌控。',
+      desc: '雙色重疊多邊形與數據節點，象徵跨部門專案高度交織與全方位掌控。',
       highlights: ['Linear / Vercel 極簡科技感', '高階極簡 Slate-900 暗色底襯', '精準幾何邊線與中心焦點'],
     },
     {

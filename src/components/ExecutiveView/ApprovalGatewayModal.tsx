@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Project, MilestoneChangeRequest, OrgChangeRequest } from '../../types';
 import { getN1Approver } from '../../utils/approverUtils';
+import { useLanguage } from '../../context/LanguageContext';
 import { 
   X, 
   FileCheck2, 
@@ -42,6 +43,8 @@ export const ApprovalGatewayModal: React.FC<ApprovalGatewayModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const { language } = useLanguage();
+  const isEn = language === 'en';
   const [activeTab, setActiveTab] = useState<'PROJECTS' | 'ORG'>('PROJECTS');
   const [comments, setComments] = useState<{ [reqId: string]: string }>({});
   const [lastActionMsg, setLastActionMsg] = useState<string | null>(null);
@@ -112,14 +115,16 @@ export const ApprovalGatewayModal: React.FC<ApprovalGatewayModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-white">部門 N-1 / 高層簽核中心 (Approval Gateway)</h2>
+                <h2 className="text-base sm:text-lg font-bold text-white">
+                  {isEn ? 'Department N-1 / Executive Approval Gateway' : '部門 N-1 / 高層簽核中心 (Approval Gateway)'}
+                </h2>
                 <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-mono font-bold text-xs shadow-xs">
-                  {pendingItems.length + pendingOrgItems.length} 筆待簽核
+                  {pendingItems.length + pendingOrgItems.length} {isEn ? 'Pending' : '筆待簽核'}
                 </span>
               </div>
               <p className="text-xs text-slate-300 mt-0.5 flex items-center gap-1">
                 <Lock className="w-3 h-3 text-amber-400" />
-                <span>組織架構與專案授權防護：依 N-1 層級主管權責進行二階審核</span>
+                <span>{isEn ? 'Org Governance & Authorization Guard: Two-stage review by N-1 executives' : '組織架構與專案授權防護：依 N-1 層級主管權責進行二階審核'}</span>
               </p>
             </div>
           </div>
@@ -131,7 +136,7 @@ export const ApprovalGatewayModal: React.FC<ApprovalGatewayModalProps> = ({
                 className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md transition-all cursor-pointer"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>一鍵全部核准</span>
+                <span>{isEn ? 'Approve All' : '一鍵全部核准'}</span>
               </button>
             )}
 
@@ -155,7 +160,7 @@ export const ApprovalGatewayModal: React.FC<ApprovalGatewayModalProps> = ({
             }`}
           >
             <FileCheck2 className="w-4 h-4 text-indigo-600" />
-            <span>專案與里程碑異動審核 ({pendingItems.length})</span>
+            <span>{isEn ? `Milestones & Project Approvals (${pendingItems.length})` : `專案與里程碑異動審核 (${pendingItems.length})`}</span>
           </button>
 
           <button
@@ -167,7 +172,7 @@ export const ApprovalGatewayModal: React.FC<ApprovalGatewayModalProps> = ({
             }`}
           >
             <Users className="w-4 h-4 text-emerald-600" />
-            <span>HR 組織架構變更簽核 ({pendingOrgItems.length})</span>
+            <span>{isEn ? `HR Org Change Approvals (${pendingOrgItems.length})` : `HR 組織架構變更簽核 (${pendingOrgItems.length})`}</span>
             {pendingOrgItems.length > 0 && (
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             )}

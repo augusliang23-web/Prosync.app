@@ -1,5 +1,6 @@
 import React from 'react';
 import { HealthStatus } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ProgressBarProps {
   progress: number; // 0 to 100
@@ -14,6 +15,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   size = 'md',
   showLabel = true,
 }) => {
+  const { language } = useLanguage();
+  const isEn = language === 'en';
+
   const heightClass = {
     sm: 'h-1.5',
     md: 'h-2.5',
@@ -33,7 +37,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     <div className="w-full">
       {showLabel && (
         <div className="flex justify-between items-center mb-1 text-xs font-medium text-slate-600">
-          <span>進度完成率</span>
+          <span>{isEn ? 'Completion Rate' : '進度完成率'}</span>
           <span className="font-semibold text-slate-800">{safeProgress}%</span>
         </div>
       )}

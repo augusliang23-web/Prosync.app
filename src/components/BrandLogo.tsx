@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type LogoVariant = 'mesh' | 'diamond' | 'pulse';
+export type LogoVariant = 'prosync' | 'mesh' | 'diamond' | 'pulse';
 
 interface BrandLogoProps {
   variant?: LogoVariant;
@@ -10,18 +10,35 @@ interface BrandLogoProps {
 }
 
 export const BrandLogo: React.FC<BrandLogoProps> = ({
-  variant = 'mesh',
+  variant = 'prosync',
   size = 'md',
   showText = true,
   textClassName = '',
 }) => {
   const dimensionClass = size === 'sm' ? 'w-6 h-6' : size === 'lg' ? 'w-10 h-10' : 'w-8 h-8';
-  const textContainerClass = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-lg' : 'text-sm';
+  const textContainerClass = size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-xl' : 'text-base';
 
   const renderIcon = () => {
     switch (variant) {
+      case 'prosync':
+      default:
+        // Clean, standard modern letter P logo
+        return (
+          <div className={`${dimensionClass} rounded-lg bg-gradient-to-br from-indigo-600 via-purple-600 to-violet-700 flex items-center justify-center shadow-sm shrink-0 font-bold text-white tracking-tight text-lg select-none`}>
+            <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
+              <path
+                d="M8 6H18C22.4183 6 26 9.58172 26 14C26 18.4183 22.4183 22 18 22H13V26C13 27.1046 12.1046 28 11 28C9.89543 28 9 27.1046 9 26V8C9 6.89543 8 6 8 6Z"
+                fill="currentColor"
+              />
+              <path
+                d="M13 11H18C19.6569 11 21 12.3431 21 14C21 15.6569 19.6569 17 18 17H13V11Z"
+                fill="#818CF8"
+              />
+            </svg>
+          </div>
+        );
+
       case 'mesh':
-        // Option A: Prism Mesh - Geometric Overlapping Gradient Nodes
         return (
           <div className={`${dimensionClass} rounded-lg bg-slate-900 p-1 flex items-center justify-center shadow-xs border border-slate-700/50 shrink-0 group`}>
             <svg viewBox="0 0 32 32" fill="none" className="w-full h-full">
@@ -43,7 +60,6 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         );
 
       case 'diamond':
-        // Option B: Diamond Matrix - 4 Rotated Precision Facets
         return (
           <div className={`${dimensionClass} rounded-lg bg-indigo-950 p-1 flex items-center justify-center shadow-xs border border-indigo-800/60 shrink-0 group`}>
             <svg viewBox="0 0 32 32" fill="none" className="w-full h-full">
@@ -62,7 +78,6 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         );
 
       case 'pulse':
-        // Option C: Velocity Pulse Ring - Dynamic Orbit with Core Spark
         return (
           <div className={`${dimensionClass} rounded-lg bg-slate-900 p-1 flex items-center justify-center shadow-xs border border-slate-700/60 shrink-0 group`}>
             <svg viewBox="0 0 32 32" fill="none" className="w-full h-full">
@@ -79,9 +94,6 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
             </svg>
           </div>
         );
-
-      default:
-        return null;
     }
   };
 
@@ -90,11 +102,11 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       {renderIcon()}
       {showText && (
         <div className="leading-none">
-          <span className={`font-black text-slate-900 tracking-tight block ${textContainerClass} ${textClassName}`}>
-            PRO<span className="text-indigo-600">SYNC</span>
+          <span className={`font-black tracking-tight block ${textContainerClass} ${textClassName || 'text-slate-900'}`}>
+            Pro<span className={textClassName?.includes('text-white') ? 'text-indigo-400' : 'text-indigo-600'}>Sync</span>
           </span>
-          <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest block mt-0.5">
-            Executive PM
+          <span className={`text-[9px] font-bold tracking-widest uppercase block mt-0.5 ${textClassName?.includes('text-white') ? 'text-slate-400' : 'text-slate-500'}`}>
+            AI Project Platform
           </span>
         </div>
       )}
