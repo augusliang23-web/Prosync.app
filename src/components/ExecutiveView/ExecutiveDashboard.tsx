@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Project, ExecutiveBriefing, Department, HealthStatus, MilestoneChangeRequest, Currency } from '../../types';
+import { Project, ExecutiveBriefing, Department, HealthStatus, MilestoneChangeRequest, Currency, ExecutiveDecisionRecord, CriticalRiskItem } from '../../types';
 import { HealthBadge } from '../common/HealthBadge';
 import { ProgressBar } from '../common/ProgressBar';
 import { ExecutiveBriefingCard } from './ExecutiveBriefingCard';
@@ -34,6 +34,7 @@ import {
 interface ExecutiveDashboardProps {
   projects: Project[];
   briefing: ExecutiveBriefing;
+  decisions?: ExecutiveDecisionRecord[];
   onUpdateBriefing: (briefing: ExecutiveBriefing) => void;
   onSelectProject: (projectId: string) => void;
   onOpenLogUpdate: (project: Project) => void;
@@ -41,11 +42,15 @@ interface ExecutiveDashboardProps {
   onReviewMilestoneRequest?: (projectId: string, requestId: string, action: 'APPROVE' | 'REJECT', comment?: string) => void;
   onOpenApprovalGateway?: () => void;
   onOpenLinkedInModal?: () => void;
+  onOpenCaptureDecision?: (riskItem: CriticalRiskItem) => void;
+  onOpenSystemOfRecord?: () => void;
+  onOpenAIQA?: (question: string) => void;
 }
 
 export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   projects,
   briefing,
+  decisions = [],
   onUpdateBriefing,
   onSelectProject,
   onOpenLogUpdate,
@@ -53,6 +58,9 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   onReviewMilestoneRequest,
   onOpenApprovalGateway,
   onOpenLinkedInModal,
+  onOpenCaptureDecision,
+  onOpenSystemOfRecord,
+  onOpenAIQA
 }) => {
   const { language, t } = useLanguage();
   const isEn = language === 'en';
@@ -377,12 +385,16 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         </section>
       )}
 
-      {/* 5. Executive Briefing Card */}
+      {/* 5. Executive Briefing Card & Closed-Loop System of Record Trigger */}
       <ExecutiveBriefingCard
         briefing={briefing}
         projects={projects}
+        decisions={decisions}
         onUpdateBriefing={onUpdateBriefing}
         onSelectProject={onSelectProject}
+        onOpenCaptureDecision={onOpenCaptureDecision}
+        onOpenSystemOfRecord={onOpenSystemOfRecord}
+        onOpenAIQA={onOpenAIQA}
       />
 
       {/* Portfolio Grid Section */}

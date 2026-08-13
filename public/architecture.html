@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProSync AI - 產品系統階層架構、資料流向與外部 API 對接藍圖</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: #0b0f19;
+      color: #f1f5f9;
+    }
+    .gradient-border {
+      position: relative;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(16,185,129,0.1));
+    }
+    .flow-line {
+      position: relative;
+    }
+    .flow-line::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -12px;
+      transform: translateY(-50%);
+      border-width: 6px 0 6px 8px;
+      border-style: solid;
+      border-color: transparent transparent transparent #6366f1;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-20">
+
+  <!-- Navigation Bar -->
+  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 flex items-center justify-center font-bold text-white text-lg shadow-lg">
+        ⚡
+      </div>
+      <div>
+        <h1 class="text-lg font-extrabold text-white flex items-center gap-2">
+          ProSync Enterprise AI
+          <span class="px-2 py-0.5 text-xs bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full font-mono">v2.5 System Blueprint</span>
+        </h1>
+        <p class="text-xs text-slate-400">產品階層架構、動態資料流向、模組功能規格與外部 API 對接說明書</p>
+      </div>
+    </div>
+
+    <!-- Quick Navigation Links -->
+    <nav class="hidden md:flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+      <a href="#hierarchy" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">1. 產品階層架構</a>
+      <a href="#dataflow" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">2. 資料流向圖 (Pipelines)</a>
+      <a href="#modules" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">3. 模組功能說明</a>
+      <a href="#apis" class="px-3 py-1.5 rounded-lg text-indigo-400 hover:bg-indigo-950/50 transition">4. 外部 API & 整合對接</a>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <button onclick="window.print()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-1.5 transition cursor-pointer">
+        <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+        <span>列印藍圖 / PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 space-y-12">
+
+    <!-- Executive Summary Card -->
+    <section class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 max-w-4xl space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 text-xs font-mono font-bold border border-indigo-500/20">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+          ENTERPRISE ARCHITECTURE SPECIFICATION
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-white leading-tight">
+          ProSync AI 企業專案數據治理與 C-Suite 決策閉環系統
+        </h2>
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+          本系統設計宗旨在於消除企業「基層 PM 週報資訊斷層」與「高層決策無記錄」之痛點。透過 **Google Gemini 3.6 Flash** 雙向數據賦能，將口語化週報自動轉換為具備 ROI 剖析的 Executive Briefing，並建立永久可審計的 **Decision System of Record (高層決策拍板履歷)**。
+        </p>
+        <div class="pt-2 flex flex-wrap gap-4 text-xs font-medium text-slate-400">
+          <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> 前端：React 18 + Vite + Tailwind CSS</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> 後端：Express.js RESTful API + Node.js</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> AI 核心：Google Gemini 3.6 Flash (@google/genai)</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> 狀態持久化：Local Storage / Cloud SQL / Firestore</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- SECTION 1: PRODUCT HIERARCHY ARCHITECTURE -->
+    <section id="hierarchy" class="space-y-6 scroll-mt-24">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-xs font-black">1</span>
+            產品階層架構 (Product Layer Architecture)
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">分為前端展示層、後端服務閘道層、AI 智能運算核心層、以及企業資料與持久化層</p>
+        </div>
+        <span class="text-xs font-mono text-indigo-400 bg-indigo-950/80 px-3 py-1 rounded-lg border border-indigo-800">4-Tier System</span>
+      </div>
+
+      <!-- Layer Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        <!-- Layer 1: Frontend Layer -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/50 transition-all space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-950/60 px-2.5 py-0.5 rounded border border-indigo-800/50">
+                Layer 1: User Experience
+              </span>
+              <i data-lucide="layout-dashboard" class="w-5 h-5 text-indigo-400"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">前端視圖與互動層</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              基於 React 18 SPA 構建，包含雙重視角 (C-Suite 戰略導向 / PM 實務營運導向)。
+            </p>
+            <ul class="space-y-2 text-xs text-slate-300 pt-2 border-t border-slate-800">
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5"></i>
+                <span><strong>ExecutiveDashboard:</strong> 全公司 ROI 與指標中心</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5"></i>
+                <span><strong>ExecutiveBriefingCard:</strong> 高層週報與 AI 警報</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5"></i>
+                <span><strong>DecisionCaptureModal:</strong> 高層拍板授權與預算核撥</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5"></i>
+                <span><strong>OrgStructureView:</strong> 人力跨部門借調看板</span>
+              </li>
+            </ul>
+          </div>
+          <div class="pt-3 border-t border-slate-800/80 text-[11px] font-mono text-slate-500">
+            Tech: React 18, Vite, Tailwind CSS, Lucide
+          </div>
+        </div>
+
+        <!-- Layer 2: API Gateway Layer -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-emerald-500/50 transition-all space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded border border-emerald-800/50">
+                Layer 2: Service Gateway
+              </span>
+              <i data-lucide="server" class="w-5 h-5 text-emerald-400"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Express 後端 API 閘道</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              負責阻絕前端暴露 API Key，處理 Prompt 工程、資料驗證與跨域防護。
+            </p>
+            <ul class="space-y-2 text-xs text-slate-300 pt-2 border-t border-slate-800">
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
+                <span><code class="text-emerald-300">/api/ai/executive-summary</code>: AI 簡報生成</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
+                <span><code class="text-emerald-300">/api/ai/qa</code>: 戰略問答秘書控制</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
+                <span><code class="text-emerald-300">/api/ai/polish-update</code>: PM 週報 AI 潤飾</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
+                <span><code class="text-emerald-300">/api/health</code>: 系統與 API 金鑰健康診斷</span>
+              </li>
+            </ul>
+          </div>
+          <div class="pt-3 border-t border-slate-800/80 text-[11px] font-mono text-slate-500">
+            Tech: Node.js, Express 4.x, TypeScript
+          </div>
+        </div>
+
+        <!-- Layer 3: AI Intelligence Engine -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-amber-500/50 transition-all space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400 bg-amber-950/60 px-2.5 py-0.5 rounded border border-amber-800/50">
+                Layer 3: AI Engine
+              </span>
+              <i data-lucide="cpu" class="w-5 h-5 text-amber-400"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Gemini 3.6 Flash 運算核心</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Google 高速 Multimodal LLM，透過廣泛 Context Window 進行強大分析。
+            </p>
+            <ul class="space-y-2 text-xs text-slate-300 pt-2 border-t border-slate-800">
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
+                <span><strong>Structured JSON Output:</strong> 嚴格 Schema 契約</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
+                <span><strong>Domain Instruction:</strong> C-Suite COO 經驗角色扮演</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
+                <span><strong>Risk Extraction:</strong> 自動抽取 AT_RISK 與阻礙根因</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
+                <span><strong>Action Recommendation:</strong> 產生可具體執行對策</span>
+              </li>
+            </ul>
+          </div>
+          <div class="pt-3 border-t border-slate-800/80 text-[11px] font-mono text-slate-500">
+            SDK: @google/genai (gemini-3.6-flash)
+          </div>
+        </div>
+
+        <!-- Layer 4: Enterprise Data & Audit Log Layer -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-purple-500/50 transition-all space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-purple-400 bg-purple-950/60 px-2.5 py-0.5 rounded border border-purple-800/50">
+                Layer 4: Data & Audit Log
+              </span>
+              <i data-lucide="database" class="w-5 h-5 text-purple-400"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">資料與永久履歷日誌層</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              管理專案狀態、財務支出、成員組織庫與永久不可竄改高層決策紀錄。
+            </p>
+            <ul class="space-y-2 text-xs text-slate-300 pt-2 border-t border-slate-800">
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5"></i>
+                <span><strong>Projects Entity:</strong> 健康度、預算、里程碑</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5"></i>
+                <span><strong>Decision Records:</strong> 拍板編號 DEC-xxx、核准資金</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5"></i>
+                <span><strong>Traceable Action Items:</strong> 責任人、履約死線</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5"></i>
+                <span><strong>Org Requests:</strong> 跨部門借調申請單據</span>
+              </li>
+            </ul>
+          </div>
+          <div class="pt-3 border-t border-slate-800/80 text-[11px] font-mono text-slate-500">
+            Storage: LocalStorage / Cloud SQL / Firestore
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- SECTION 2: DATA FLOW PIPELINE -->
+    <section id="dataflow" class="space-y-6 scroll-mt-24">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center text-xs font-black">2</span>
+            端到端資料流向 (End-to-End Data Pipelines)
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">四大核心情境的完整資料傳遞流程與轉譯階段</p>
+        </div>
+      </div>
+
+      <!-- Pipeline Tabs -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800">
+          <button onclick="switchPipeline('p1')" id="tab-p1" class="px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-indigo-600 text-white border border-indigo-500">
+            管道 A: PM 週報 AI 潤飾流 (Polish Flow)
+          </button>
+          <button onclick="switchPipeline('p2')" id="tab-p2" class="px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-800 text-slate-400 hover:bg-slate-700">
+            管道 B: 高層 AI 週報彙整流 (Briefing Flow)
+          </button>
+          <button onclick="switchPipeline('p3')" id="tab-p3" class="px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-800 text-slate-400 hover:bg-slate-700">
+            管道 C: 高層決策閉環與履歷紀錄流 (System of Record Flow)
+          </button>
+          <button onclick="switchPipeline('p4')" id="tab-p4" class="px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-800 text-slate-400 hover:bg-slate-700">
+            管道 D: 高層 AI 戰略對話問答流 (Executive QA Flow)
+          </button>
+        </div>
+
+        <!-- Pipeline Content Containers -->
+        
+        <!-- P1: Polish Flow -->
+        <div id="content-p1" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-indigo-300 flex items-center gap-2">
+              <i data-lucide="wand-2" class="w-4 h-4 text-indigo-400"></i>
+              管道 A：PM 週報輸入 ➔ AI 專業潤飾 ➔ 送審與寫入歷史
+            </h3>
+            <span class="text-xs font-mono text-slate-400">Latency: ~1.2s</span>
+          </div>
+
+          <!-- Horizontal Steps Visual -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 relative">
+              <span class="text-[10px] font-mono text-slate-500 font-bold">STEP 01</span>
+              <h4 class="text-xs font-bold text-white">PM 輸入草稿</h4>
+              <p class="text-[11px] text-slate-400">PM 於 UI 填寫口語化、非格式化之本週成就與阻礙障礙。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-indigo-900/50 space-y-2 relative">
+              <span class="text-[10px] font-mono text-indigo-400 font-bold">STEP 02</span>
+              <h4 class="text-xs font-bold text-white">POST /api/ai/polish-update</h4>
+              <p class="text-[11px] text-slate-400">打包傳至 Express，注入量化點陣化專屬 Prompt 指令。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-indigo-900/50 space-y-2 relative">
+              <span class="text-[10px] font-mono text-indigo-400 font-bold">STEP 03</span>
+              <h4 class="text-xs font-bold text-white">Gemini 3.6 Flash 處理</h4>
+              <p class="text-[11px] text-slate-400">模型解析動詞、數據指標，並按照 JSON Schema 格式輸出專業點陣文字。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-emerald-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-emerald-400 font-bold">STEP 04</span>
+              <h4 class="text-xs font-bold text-white">更新 UI & State Sync</h4>
+              <p class="text-[11px] text-slate-400">潤飾內容回填輸入框，PM 確認後點擊送出，儲存至專案最新週報演進鏈。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- P2: Briefing Flow -->
+        <div id="content-p2" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-emerald-300 flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+              管道 B：全公司專案進度 ➔ 高層 AI Briefing 綜合研判 ➔ 儀表板渲染
+            </h3>
+            <span class="text-xs font-mono text-slate-400">Latency: ~2.1s</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+              <span class="text-[10px] font-mono text-slate-500 font-bold">STEP 01</span>
+              <h4 class="text-xs font-bold text-white">高層觸發生成</h4>
+              <p class="text-[11px] text-slate-400">點擊「重新生成 Executive Briefing」或定期自動背景排程。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-emerald-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-emerald-400 font-bold">STEP 02</span>
+              <h4 class="text-xs font-bold text-white">POST /api/ai/executive-summary</h4>
+              <p class="text-[11px] text-slate-400">傳送全公司所有 Projects 數據陣列 (包含健康度、預算支出與最新週報)。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-emerald-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-emerald-400 font-bold">STEP 03</span>
+              <h4 class="text-xs font-bold text-white">JSON Schema 結構提取</h4>
+              <p class="text-[11px] text-slate-400">Gemini 依據 Schema 產出摘要、Critical Blockers、Top Wins 與跨部門戰略建議。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-indigo-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-indigo-400 font-bold">STEP 04</span>
+              <h4 class="text-xs font-bold text-white">財務與警報併合</h4>
+              <p class="text-[11px] text-slate-400">後端計算精確總預算、實際支出與完成度後，回傳前端進行高層檢視。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- P3: System of Record Flow -->
+        <div id="content-p3" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-amber-300 flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+              管道 C：高層點擊拍板 ➔ 產生唯一 DEC 履歷 ID ➔ 自動授權與行動項追蹤 (Closed-Loop)
+            </h3>
+            <span class="text-xs font-mono text-slate-400">Latency: Instant (Local/Database Transaction)</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-slate-950 p-4 rounded-xl border border-amber-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-amber-400 font-bold">STEP 01</span>
+              <h4 class="text-xs font-bold text-white">點擊「進行高層拍板」</h4>
+              <p class="text-[11px] text-slate-400">於 Briefing Card 臨界風險欄位點擊按鈕，開起授權 Modal。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-amber-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-amber-400 font-bold">STEP 02</span>
+              <h4 class="text-xs font-bold text-white">輸入決策與授權金額</h4>
+              <p class="text-[11px] text-slate-400">主管選擇批示類別 (追加預算/人力支援/時程延後)，輸入決策者姓名與批示內容。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-purple-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-purple-400 font-bold">STEP 03</span>
+              <h4 class="text-xs font-bold text-white">生成 DEC-xxx 交易紀錄</h4>
+              <p class="text-[11px] text-slate-400">系統產生唯一交易 ID、防竄改時間戳記，並衍生關聯 Action Items 可追蹤任務。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-emerald-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-emerald-400 font-bold">STEP 04</span>
+              <h4 class="text-xs font-bold text-white">自動更新專案預算與閉環</h4>
+              <p class="text-[11px] text-slate-400">若包含追加預算，系統自動同步加算至專案 `totalBudget`，簡報標示為「已拍板」。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- P4: QA Flow -->
+        <div id="content-p4" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-purple-300 flex items-center gap-2">
+              <i data-lucide="message-square-text" class="w-4 h-4 text-purple-400"></i>
+              管道 D：主管問答諮詢 ➔ 傳送 Context ➔ Gemini 戰略秘書剖析
+            </h3>
+            <span class="text-xs font-mono text-slate-400">Latency: ~1.5s</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+              <span class="text-[10px] font-mono text-slate-500 font-bold">STEP 01</span>
+              <h4 class="text-xs font-bold text-white">主管提問或預設快捷鍵</h4>
+              <p class="text-[11px] text-slate-400">主管輸入疑問 (例如「哪幾個專案預算超標需要關注？」) 或點擊 AI 建議案例。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-purple-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-purple-400 font-bold">STEP 02</span>
+              <h4 class="text-xs font-bold text-white">POST /api/ai/qa Context 注入</h4>
+              <p class="text-[11px] text-slate-400">將問題連同全公司所有專案數據與最新 Briefing 摘要一同打包傳至伺服器。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-purple-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-purple-400 font-bold">STEP 03</span>
+              <h4 class="text-xs font-bold text-white">Gemini 戰略顧問推論</h4>
+              <p class="text-[11px] text-slate-400">模型先給出直接結論，次要說明根本原因，最後列出 3 點具體決策建議。</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-indigo-900/50 space-y-2">
+              <span class="text-[10px] font-mono text-indigo-400 font-bold">STEP 04</span>
+              <h4 class="text-xs font-bold text-white">Markdown 格式精美呈現</h4>
+              <p class="text-[11px] text-slate-400">前端渲染問答卡片，支援一鍵複製與延伸問題追問。</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- SECTION 3: MODULE FUNCTIONAL BREAKDOWN -->
+    <section id="modules" class="space-y-6 scroll-mt-24">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-amber-600 flex items-center justify-center text-xs font-black">3</span>
+            核心模組功能與規格細節 (Module Functional Specification)
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">前端 7 大模組功能清單、操作邊界與核心職責</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- Module 1 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-400"></i>
+              模組 1: C-Suite 戰略儀表板 (Executive Dashboard)
+            </h3>
+            <span class="text-[10px] font-mono text-indigo-400 bg-indigo-950 px-2 py-0.5 rounded">Core Portal</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            為 CEO/COO 打造的高總覽視圖。整合整體投資報酬率 (ROI)、預算執行率 (Budget Utilization)、全公司健康度分佈 (ON_TRACK / AT_RISK / DELAYED)，以及跨部門健康度柱狀圖。
+          </p>
+          <div class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="font-bold text-slate-200">關鍵功能特點：</div>
+            <ul class="list-disc list-inside space-y-0.5 text-slate-400">
+              <li>一鍵切換多國貨幣 (TWD / USD / EUR) 與動態匯率即時折算</li>
+              <li>過濾器：依據部門 (研發部/IT/行銷/營運) 與健康狀態交叉篩選</li>
+              <li>自動警報：若專案落後，自動突出顯示紅字風險提示</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+              模組 2: 高層 AI 週報與觸發器 (Executive Briefing Card)
+            </h3>
+            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded">AI Engine</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            展示 AI 產出的全公司綜合週報。將全公司數十份複雜週報蒸餾為「10 秒讀懂」的關鍵對策、高風險阻礙清單、Top Wins 與跨部門戰略建議。
+          </p>
+          <div class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="font-bold text-slate-200">關鍵功能特點：</div>
+            <ul class="list-disc list-inside space-y-0.5 text-slate-400">
+              <li>【拍板觸發器】：直連高層決策 Modal，秒級完成授權與資金核可</li>
+              <li>一鍵複製週報摘要文字 (貼至 Email 或 Line/Slack 群組)</li>
+              <li>「諮詢 AI」預設按鈕：自動帶入當前阻礙並開啟 QA 戰略秘書</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Module 3 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+              模組 3: 高層決策履歷與行動庫 (System of Record)
+            </h3>
+            <span class="text-[10px] font-mono text-amber-400 bg-amber-950 px-2 py-0.5 rounded">Audit System</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            解決企業「口頭交辦無憑無據、過後無法追責」之盲點。將高層每一次的追加預算、派員支援、批示決策永久記錄並賦予唯一交易 ID。
+          </p>
+          <div class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="font-bold text-slate-200">關鍵功能特點：</div>
+            <ul class="list-disc list-inside space-y-0.5 text-slate-400">
+              <li>決策歷程標竿庫：支援依專案、決策者、批示類型查詢搜尋</li>
+              <li>行動項 (Action Items) 狀態追蹤：未開始 ➔ 執行中 ➔ 已完工</li>
+              <li>審計等級記錄：防竄改時間戳記、額外核准資金明細</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Module 4 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4 text-purple-400"></i>
+              模組 4: 組織架構與人力調動看板 (Org Structure)
+            </h3>
+            <span class="text-[10px] font-mono text-purple-400 bg-purple-950 px-2 py-0.5 rounded">Resource Mobility</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            可視化部門樹狀圖與跨部門人力支援借調 (Mobility Requests)。當特定專案面臨技術瓶頸時，PM 可直接申請跨部門專家調動。
+          </p>
+          <div class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="font-bold text-slate-200">關鍵功能特點：</div>
+            <ul class="list-disc list-inside space-y-0.5 text-slate-400">
+              <li>成員技能標籤 (Skills Tags) 與部門歸屬展示</li>
+              <li>支援借調單申請：借調原因、借調週數、目標專案指派</li>
+              <li>高層/主管可於 Gateway 一鍵進行跨部門核准與派員</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Module 5 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="file-check-2" class="w-4 h-4 text-cyan-400"></i>
+              模組 5: 高層審批關卡 Modal (Approval Gateway)
+            </h3>
+            <span class="text-[10px] font-mono text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded">Gateway</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            集中管理所有待一級主管審核的單據。包含專案里程碑變更、展延申請、預算追加申請以及組織借調申請。
+          </p>
+          <div class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="font-bold text-slate-200">關鍵功能特點：</div>
+            <ul class="list-disc list-inside space-y-0.5 text-slate-400">
+              <li>數字標記 (Badge)：即時顯示待審批單據總量</li>
+              <li>支援核准 (APPROVE) / 駁回 (REJECT) 並填寫主管批註留言</li>
+              <li>審批後自動觸發專案時間軸與狀態之更新</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Module 6 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="folder-kanban" class="w-4 h-4 text-rose-400"></i>
+              模組 6: PM 實務營運入口 (PM Portal & Details)
+            </h3>
+            <span class="text-[10px] font-mono text-rose-400 bg-rose-950 px-2 py-0.5 rounded">PM Workspace</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            專為基層與中階 PM 設計的執行工作台。包含專案卡片圖表、S-Curve 預算曲線、里程碑進度甘特圖、以及週報填寫入口。
+          </p>
+          <div class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="font-bold text-slate-200">關鍵功能特點：</div>
+            <ul class="list-disc list-inside space-y-0.5 text-slate-400">
+              <li>內建【AI 週報潤飾工具】：一鍵將口語草稿轉為數據化點陣文字</li>
+              <li>歷史週報演進時間軸：完整紀錄歷週專案演化軌跡</li>
+              <li>發起里程碑展延申請：填寫展延原因與新日期送高層審批</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- SECTION 4: EXTERNAL API & TOOLS INTEGRATION -->
+    <section id="apis" class="space-y-6 scroll-mt-24">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center text-xs font-black">4</span>
+            外部工具與 API 對接規格書 (External API & Tools Integration)
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">真實上線需要整合的外部服務、驗證機制、資料庫與 Webhooks 對接說明</p>
+        </div>
+      </div>
+
+      <!-- API Specification Table -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-950 text-slate-300 font-bold border-b border-slate-800 uppercase tracking-wider">
+              <tr>
+                <th class="p-4">外部服務 / API 類別</th>
+                <th class="p-4">對接工具 / 套件 (SDK)</th>
+                <th class="p-4">必要環境變數 / API Key</th>
+                <th class="p-4">對接目的與運作機制</th>
+                <th class="p-4">生產環境建議 (Production Note)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/80 text-slate-300">
+              
+              <!-- Gemini AI API -->
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="p-4 font-bold text-indigo-400 flex items-center gap-2">
+                  <i data-lucide="cpu" class="w-4 h-4 text-indigo-400"></i>
+                  Google Gemini API
+                </td>
+                <td class="p-4 font-mono text-slate-400">@google/genai</td>
+                <td class="p-4 font-mono text-amber-400">GEMINI_API_KEY</td>
+                <td class="p-4 leading-relaxed">
+                  使用模型 <code class="text-indigo-300">gemini-3.6-flash</code>。<br>
+                  1. 自動分析週報並產出結構化 Executive Briefing JSON<br>
+                  2. 擔任 C-Suite 戰略 AI 秘書提供即時問答<br>
+                  3. PM 週報草稿專業點陣化潤飾
+                </td>
+                <td class="p-4 text-slate-400">
+                  必須嚴格保存在伺服器端（Express Server），絕對不可暴露至前端 <code class="text-rose-400">VITE_</code> 公開變數中。
+                </td>
+              </tr>
+
+              <!-- Cloud Database -->
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="p-4 font-bold text-emerald-400 flex items-center gap-2">
+                  <i data-lucide="database" class="w-4 h-4 text-emerald-400"></i>
+                  企業資料庫 (Database)
+                </td>
+                <td class="p-4 font-mono text-slate-400">PostgreSQL (Drizzle ORM) 或 Firebase Firestore</td>
+                <td class="p-4 font-mono text-amber-400">DATABASE_URL / FIREBASE_CONFIG</td>
+                <td class="p-4 leading-relaxed">
+                  將原本存於 LocalStorage 的數據持久化到雲端。<br>
+                  包含 Projects, Updates, Employees, OrgRequests, 以及 ExecutiveDecisions 不可竄改歷史軌跡表。
+                </td>
+                <td class="p-4 text-slate-400">
+                  建議設定 Database Indexing 於 <code class="text-emerald-300">projectId</code> 與 <code class="text-emerald-300">generatedAt</code> 增進加載效率。
+                </td>
+              </tr>
+
+              <!-- Enterprise SSO -->
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="p-4 font-bold text-amber-400 flex items-center gap-2">
+                  <i data-lucide="key-round" class="w-4 h-4 text-amber-400"></i>
+                  單一登入 (Enterprise SSO)
+                </td>
+                <td class="p-4 font-mono text-slate-400">Google Workspace OAuth 2.0 / Okta / Azure AD</td>
+                <td class="p-4 font-mono text-amber-400">OAUTH_CLIENT_ID / OAUTH_CLIENT_SECRET</td>
+                <td class="p-4 leading-relaxed">
+                  實行企業級權限控管 (RBAC)。<br>
+                  區分 **Executive (高層權限)**、**PM (專案經理權限)** 與 **Employee (一般員工權限)**，確保拍板授權按鈕僅高層可用。
+                </td>
+                <td class="p-4 text-slate-400">
+                  搭配 JWT / HTTP-Only Cookie 進行 Session 保持與跨域 Token 傳送。
+                </td>
+              </tr>
+
+              <!-- Enterprise Webhooks & Notification -->
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="p-4 font-bold text-purple-400 flex items-center gap-2">
+                  <i data-lucide="bell-ring" class="w-4 h-4 text-purple-400"></i>
+                  即時通訊通知 (Webhooks)
+                </td>
+                <td class="p-4 font-mono text-slate-400">Slack Webhook / Microsoft Teams / SendGrid Email</td>
+                <td class="p-4 font-mono text-amber-400">SLACK_WEBHOOK_URL / SENDGRID_KEY</td>
+                <td class="p-4 leading-relaxed">
+                  當系統偵測到高風險專案 (AT_RISK/DELAYED) 或高層完成拍板 (Decision Captured DEC-xxx) 時，自動觸發即時通知推送至公司專屬頻道。
+                </td>
+                <td class="p-4 text-slate-400">
+                  設定背景佇列 (Queue Manager, e.g. BullMQ) 避免發送失敗阻斷主程序。
+                </td>
+              </tr>
+
+              <!-- ERP Financial Connector -->
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="p-4 font-bold text-cyan-400 flex items-center gap-2">
+                  <i data-lucide="coins" class="w-4 h-4 text-cyan-400"></i>
+                  財務 ERP 系統對接
+                </td>
+                <td class="p-4 font-mono text-slate-400">SAP / Oracle ERP / Workday REST API</td>
+                <td class="p-4 font-mono text-amber-400">ERP_API_KEY / SAP_ENDPOINT</td>
+                <td class="p-4 leading-relaxed">
+                  定時同步實際已支出預算 (<code class="text-cyan-300">spentBudget</code>) 與報銷單據，避免 PM 週報與實際財務帳務產生差距。
+                </td>
+                <td class="p-4 text-slate-400">
+                  設定每日夜間排程 (Cron Job) 進行雙向數據對帳與更新。
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Note -->
+    <footer class="pt-8 border-t border-slate-800 text-center text-xs text-slate-500 space-y-2">
+      <p>© 2026 ProSync Enterprise AI Build System. Standardized Architecture Blueprint.</p>
+      <p>This document is automatically generated and synchronized with current source code implementation.</p>
+    </footer>
+
+  </main>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Tab Switcher for Pipeline Section
+    function switchPipeline(pipelineId) {
+      const ids = ['p1', 'p2', 'p3', 'p4'];
+      
+      ids.forEach(id => {
+        const tab = document.getElementById('tab-' + id);
+        const content = document.getElementById('content-' + id);
+        
+        if (id === pipelineId) {
+          tab.className = "px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-indigo-600 text-white border border-indigo-500";
+          content.classList.remove('hidden');
+        } else {
+          tab.className = "px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-800 text-slate-400 hover:bg-slate-700";
+          content.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -369,3 +369,78 @@ export const INITIAL_EXECUTIVE_BRIEFING: ExecutiveBriefing = {
     '【供應商管理政策】：宣導將採購部供應商評鑑與永續部碳盤查問卷填報率強制連結，提高範疇三數據回覆率。'
   ]
 };
+
+export const INITIAL_DECISION_RECORDS: any[] = [
+  {
+    id: 'dec-001',
+    projectId: 'prj-002',
+    projectName: '核心 ERP 與微服務架構重構',
+    department: 'IT資訊部',
+    leadPm: '王大衛 (David Wang)',
+    decisionMakerRole: 'VP of Technology & Operations',
+    decisionMakerName: '張董事長 / Marcus Chang',
+    timestamp: '2026-08-09 15:30',
+    issueTitle: '15年舊 Oracle 資料庫存取邏輯龐雜，外包進度塞車致關鍵轉型延遲',
+    pmAssistanceRequested: '申請追加 NT$30萬 預備金聘用 2 名資深 DBA 專家協助關聯資料對帳。',
+    outcome: 'APPROVED',
+    approvedAmount: 300000,
+    approvedCurrency: 'TWD',
+    decisionReason: 'Critical schedule recovery — Approved NT$300k budget allocation for Senior DBA onboarding to prevent Q4 financial reporting blockage.',
+    actionItems: [
+      {
+        id: 'act-101',
+        title: '撥可追加 NT$30萬 預備預算至 IT 資訊部外包專戶',
+        assignee: 'CFO / 財務部',
+        dueDate: '2026-08-11',
+        status: 'COMPLETED',
+        completedAt: '2026-08-10'
+      },
+      {
+        id: 'act-102',
+        title: '完成 2 位 Senior PostgreSQL DBA 駐點合約簽署與資安授權',
+        assignee: '王大衛 (David Wang)',
+        dueDate: '2026-08-14',
+        status: 'IN_PROGRESS'
+      },
+      {
+        id: 'act-103',
+        title: '每週五回報 Oracle 至 Cloud SQL 資料對帳正確率曲線',
+        assignee: '王大衛 (David Wang)',
+        dueDate: '2026-08-21',
+        status: 'OPEN'
+      }
+    ]
+  },
+  {
+    id: 'dec-002',
+    projectId: 'prj-003',
+    projectName: 'Q3 全球品牌形象與線上行銷活動',
+    department: '行銷部',
+    leadPm: '林哲宇 (Alex Lin)',
+    decisionMakerRole: 'VP of Marketing',
+    decisionMakerName: '林副總 / Sarah Lin',
+    timestamp: '2026-08-08 11:15',
+    issueTitle: '形象影片製作廠商因導演確診交件延後 10 天，影響 Q3 預購上線',
+    pmAssistanceRequested: '請主管核准先以精華組圖與精簡短影音 (Reels) 先行開跑開賣預熱。',
+    outcome: 'APPROVED',
+    decisionReason: 'Approved flexible Reels marketing wave to capture high-intent Q3 traffic without waiting for full video delivery.',
+    actionItems: [
+      {
+        id: 'act-201',
+        title: '上架預備 Reels 腳本組圖與 IG/Meta 廣告投放預熱',
+        assignee: '林哲宇 (Alex Lin)',
+        dueDate: '2026-08-10',
+        status: 'COMPLETED',
+        completedAt: '2026-08-09'
+      },
+      {
+        id: 'act-202',
+        title: '追蹤影音製作廠商 8/12 補拍與第二次門檻驗收',
+        assignee: '林哲宇 (Alex Lin)',
+        dueDate: '2026-08-12',
+        status: 'IN_PROGRESS'
+      }
+    ]
+  }
+];
+

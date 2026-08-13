@@ -13,13 +13,13 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  Palette,
   FileCheck2,
   Users,
   Shield,
   UserCheck,
   HeartHandshake,
-  Share2
+  Share2,
+  ShieldCheck
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -42,6 +42,8 @@ interface SidebarProps {
   pendingApprovalsCount?: number;
   onOpenApprovalGateway?: () => void;
   onOpenLinkedInModal?: () => void;
+  onOpenSystemOfRecord?: () => void;
+  decisionsCount?: number;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -64,6 +66,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   pendingApprovalsCount = 0,
   onOpenApprovalGateway,
   onOpenLinkedInModal,
+  onOpenSystemOfRecord,
+  decisionsCount = 0,
 }) => {
   const { language, toggleLanguage, t } = useLanguage();
   const totalAlerts = atRiskCount + delayedCount;
@@ -100,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Brand Header */}
         <div className={`p-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/60 ${isCollapsed ? 'lg:justify-center' : ''}`}>
           
-          <div className="flex items-center gap-2 cursor-pointer" onClick={onOpenLogoSelector} title="點擊切換品牌 Logo 風格">
+          <div className="flex items-center gap-2">
             <BrandLogo variant={logoVariant} size="md" showText={!isCollapsed} textClassName="text-white" />
           </div>
 
@@ -113,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* 7 Core Features Banner / Logo Picker Trigger */}
+        {/* 7 Core Features Banner */}
         {!isCollapsed && (
           <div className="mx-3.5 mt-3.5 p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/50 text-[11px] text-slate-300 flex items-center justify-between gap-2 shadow-2xs">
             <div className="flex items-center gap-2 overflow-hidden">
@@ -125,13 +129,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             
             <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={onOpenLogoSelector}
-                className="p-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
-                title="選擇 3 款 Logo 圖標"
-              >
-                <Palette className="w-3.5 h-3.5 text-indigo-300" />
-              </button>
               <button
                 onClick={toggleLanguage}
                 className="px-1.5 py-1 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-500/30 transition-colors"
@@ -254,6 +251,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
 
             <div className="space-y-1">
+
+              {/* System of Record (高層決策履歷與行動庫) */}
+              {onOpenSystemOfRecord && (
+                <button
+                  onClick={() => {
+                    onOpenSystemOfRecord();
+                    onCloseMobile();
+                  }}
+                  title={isCollapsed ? "高層決策履歷" : undefined}
+                  className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5'} rounded-xl transition-all cursor-pointer bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    {!isCollapsed && <span>{language === 'en' ? 'Decision Record' : '高層決策履歷 (Record)'}</span>}
+                  </div>
+                  {!isCollapsed && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-emerald-500 text-slate-950 font-mono">
+                      {decisionsCount}
+                    </span>
+                  )}
+                </button>
+              )}
 
               {/* Milestone & Org Approval Gateway */}
               {onOpenApprovalGateway && (

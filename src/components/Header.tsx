@@ -8,7 +8,8 @@ import {
   FileText,
   Globe,
   FileCheck2,
-  Share2
+  Share2,
+  ShieldCheck
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -26,6 +27,8 @@ interface HeaderProps {
   onOpenApprovalGateway?: () => void;
   onOpenDemoTour?: () => void;
   onOpenLinkedInModal?: () => void;
+  onOpenSystemOfRecord?: () => void;
+  decisionsCount?: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -43,6 +46,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenApprovalGateway,
   onOpenDemoTour,
   onOpenLinkedInModal,
+  onOpenSystemOfRecord,
+  decisionsCount = 0,
 }) => {
   const { language, toggleLanguage, t } = useLanguage();
 
@@ -69,6 +74,23 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right Action Bar */}
       <div className="flex items-center gap-2 sm:gap-2.5">
+
+        {/* System of Record Quick Access Button */}
+        {onOpenSystemOfRecord && (
+          <button
+            onClick={onOpenSystemOfRecord}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition-all cursor-pointer border border-indigo-500/30"
+            title="查看高層決策歷程與行動履歷中心"
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="hidden sm:inline">
+              {language === 'en' ? 'Decision Record' : '高層決策履歷'}
+            </span>
+            <span className="px-1.5 py-0.2 rounded-full bg-emerald-500 text-slate-950 font-mono text-[10px] font-extrabold">
+              {decisionsCount}
+            </span>
+          </button>
+        )}
         
 
         {/* Prominent High-Level C-Suite Approval Notification Button */}

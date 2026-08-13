@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Project, Department, HealthStatus } from '../../types';
+import { Project, Department, HealthStatus, UserRole } from '../../types';
 import { HealthBadge } from '../common/HealthBadge';
 import { ProgressBar } from '../common/ProgressBar';
 import { useLanguage } from '../../context/LanguageContext';
@@ -12,25 +12,38 @@ import {
   Plus, 
   ArrowUpRight, 
   FileEdit, 
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  UserCheck,
+  FileCheck2,
+  AlertTriangle,
+  CheckCircle2,
+  Users,
+  Briefcase
 } from 'lucide-react';
 
 interface ProjectListProps {
+  currentRole?: UserRole;
   projects: Project[];
   onSelectProject: (projectId: string) => void;
   onOpenLogUpdate: (project: Project) => void;
   onOpenAddProject: () => void;
   onOpenEditProject?: (project: Project) => void;
+  pendingApprovalsCount?: number;
+  onOpenApprovalGateway?: () => void;
 }
 
 type ViewMode = 'GRID' | 'TABLE' | 'KANBAN';
 
 export const ProjectList: React.FC<ProjectListProps> = ({
+  currentRole = 'PM',
   projects,
   onSelectProject,
   onOpenLogUpdate,
   onOpenAddProject,
   onOpenEditProject,
+  pendingApprovalsCount = 0,
+  onOpenApprovalGateway,
 }) => {
   const { t, language } = useLanguage();
   const isEn = language === 'en';
@@ -38,6 +51,8 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDept, setSelectedDept] = useState<string>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
+
+  const isN1Manager = currentRole === 'N1_MANAGER';
 
   const filteredProjects = projects.filter((p) => {
     if (selectedDept !== 'ALL' && p.department !== selectedDept) return false;
@@ -52,6 +67,10 @@ export const ProjectList: React.FC<ProjectListProps> = ({
     }
     return true;
   });
+
+  const totalDeptBudget = filteredProjects.reduce((acc, p) => acc + p.totalBudget, 0);
+  const totalDeptSpent = filteredProjects.reduce((acc, p) => acc + p.spentBudget, 0);
+  const atRiskDeptCount = filteredProjects.filter((p) => p.health === 'AT_RISK' || p.health === 'DELAYED').length;
 
   const formatMoneyTWD = (amount: number) => {
     if (amount >= 1000000) {
@@ -70,6 +89,100 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   return (
     <div className="space-y-5">
       
+      {/* Role-Specific Mode Banner */}
+      {isN1Manager ? (
+        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-md space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0">
+                <ShieldCheck className="w-5 h-5 text-indigo-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-white tracking-wide">
+                    {isEn ? 'N-1 Department Manager Governance Center' : 'N-1 部門主管治理與簽核中心'}
+                  </h2>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                    Dept Manager View
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  {isEn ? 'Oversee departmental projects, approve milestone CRs, and monitor team resource allocation.' : '掌控部門跨專案健康度、審核 PM 變更簽呈 (CR) 與調配團隊人力資源。'}
+                </p>
+              </div>
+            </div>
+
+            {onOpenApprovalGateway && (
+              <button
+                onClick={onOpenApprovalGateway}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm transition-all shrink-0 cursor-pointer"
+              >
+                <FileCheck2 className="w-4 h-4 text-indigo-200" />
+                <span>{isEn ? 'Approval Gateway' : '主管簽核閘道'}</span>
+                {pendingApprovalsCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-rose-500 text-white animate-pulse">
+                    {pendingApprovalsCount}
+                  </span>
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* Quick Metrics for N-1 Manager */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-indigo-500/20 text-xs">
+            <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[11px] text-slate-400">{isEn ? 'Managed Projects' : '部門總專案數'}</span>
+              <div className="text-lg font-bold font-mono text-white mt-0.5">{filteredProjects.length} 個</div>
+            </div>
+            <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[11px] text-slate-400">{isEn ? 'Dept Total Budget' : '部門總預算 (TWD)'}</span>
+              <div className="text-lg font-bold font-mono text-indigo-300 mt-0.5">{formatMoneyTWD(totalDeptBudget)}</div>
+            </div>
+            <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[11px] text-slate-400">{isEn ? 'Pending CR Approvals' : '待審核變更簽呈'}</span>
+              <div className={`text-lg font-bold font-mono mt-0.5 ${pendingApprovalsCount > 0 ? 'text-amber-400 font-black' : 'text-slate-300'}`}>
+                {pendingApprovalsCount} 件
+              </div>
+            </div>
+            <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[11px] text-slate-400">{isEn ? 'Risk Projects' : '需要預警支援'}</span>
+              <div className={`text-lg font-bold font-mono mt-0.5 ${atRiskDeptCount > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                {atRiskDeptCount} 個
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-teal-950 border border-teal-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300 shrink-0">
+              <UserCheck className="w-5 h-5 text-teal-400" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-white tracking-wide">
+                  {isEn ? 'PM Execution & Status Update Workspace' : 'PM 專案經理執行與週報填寫工作區'}
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-teal-500/20 text-teal-300 border border-teal-500/40">
+                  PM View
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                {isEn ? 'Manage project deliverables, log weekly PM updates, and submit milestone change requests to N-1 managers.' : '維護專案交付里程碑、填寫每週 PM Update 與向主管通報協助或申請 CR 變更。'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onOpenAddProject}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white shadow-sm transition-all shrink-0 cursor-pointer"
+          >
+            <Plus className="w-4 h-4 text-teal-200" />
+            <span>{isEn ? 'Create New Project' : '建立新專案'}</span>
+          </button>
+        </div>
+      )}
+
       {/* Top Action & Filter Bar */}
       <div className="bg-white rounded-xl border border-slate-200/80 p-4 shadow-2xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

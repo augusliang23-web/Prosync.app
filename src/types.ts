@@ -199,3 +199,39 @@ export interface QAMessage {
   timestamp: string;
   sources?: string[];
 }
+
+export type ExecutiveDecisionOutcome = 'APPROVED' | 'REJECTED' | 'NEED_MORE_INFO' | 'PENDING';
+
+export interface TraceableActionItem {
+  id: string;
+  title: string;
+  assignee: string; // e.g. PM name or Dept
+  dueDate: string;
+  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED';
+  completedAt?: string;
+}
+
+export interface ExecutiveDecisionRecord {
+  id: string;
+  projectId: string;
+  projectName: string;
+  department: Department;
+  leadPm: string;
+  decisionMakerRole: string; // e.g. "VP of Engineering", "CEO"
+  decisionMakerName: string; // e.g. "Marcus Chang", "Sarah Lin"
+  timestamp: string; // e.g. "2026-08-10 14:30"
+  
+  // Requirement detected from PM weekly update
+  issueTitle: string; // e.g. "Project Phoenix needs additional US$80k budget"
+  pmAssistanceRequested: string; // e.g. "Request US$80,000 budget increase to secure alternative IC vendor delivery"
+  
+  // Executive Decision choice
+  outcome: ExecutiveDecisionOutcome;
+  approvedAmount?: number; // e.g. 80000 or 300000
+  approvedCurrency?: Currency; // e.g. 'USD', 'TWD'
+  decisionReason: string; // e.g. "Critical schedule recovery for Q3 product release milestone"
+  
+  // Traceable Actions generated from decision
+  actionItems: TraceableActionItem[];
+}
+

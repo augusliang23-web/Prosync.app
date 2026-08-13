@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Project, ExecutiveBriefing, UserRole, ProjectUpdate, MilestoneChangeRequest, Employee, OrgChangeRequest, OrgChangeType } from './types';
+import { Project, ExecutiveBriefing, UserRole, ProjectUpdate, MilestoneChangeRequest, Employee, OrgChangeRequest, OrgChangeType, ExecutiveDecisionRecord, CriticalRiskItem, TraceableActionItem } from './types';
 import { 
   getStoredProjects, 
   saveProjects, 
@@ -9,6 +9,8 @@ import {
   saveEmployees,
   getStoredOrgRequests,
   saveOrgRequests,
+  getStoredExecutiveDecisions,
+  saveExecutiveDecisions,
   resetToDefaults 
 } from './utils/storage';
 import { useLanguage } from './context/LanguageContext';
@@ -20,6 +22,8 @@ import { ExecutiveDashboard } from './components/ExecutiveView/ExecutiveDashboar
 import { ExecutiveQAChat } from './components/ExecutiveView/ExecutiveQAChat';
 import { ExecutiveReportModal } from './components/ExecutiveView/ExecutiveReportModal';
 import { ApprovalGatewayModal } from './components/ExecutiveView/ApprovalGatewayModal';
+import { DecisionCaptureModal } from './components/ExecutiveView/DecisionCaptureModal';
+import { DecisionSystemOfRecordModal } from './components/ExecutiveView/DecisionSystemOfRecordModal';
 import { ProjectList } from './components/PMView/ProjectList';
 import { ProjectDetailModal } from './components/PMView/ProjectDetailModal';
 import { PMUpdateModal } from './components/PMView/PMUpdateModal';
@@ -37,6 +41,7 @@ export default function App() {
   const [executiveBriefing, setExecutiveBriefing] = useState<ExecutiveBriefing>(() => getStoredExecutiveBriefing());
   const [employees, setEmployees] = useState<Employee[]>(() => getStoredEmployees());
   const [orgRequests, setOrgRequests] = useState<OrgChangeRequest[]>(() => getStoredOrgRequests());
+  const [executiveDecisions, setExecutiveDecisions] = useState<ExecutiveDecisionRecord[]>(() => getStoredExecutiveDecisions());
 
   const [currentRole, setCurrentRole] = useState<UserRole>('EXECUTIVE');
   const [currentView, setCurrentView] = useState<'PROJECTS' | 'ORG_STRUCTURE'>('PROJECTS');
@@ -145,6 +150,11 @@ export default function App() {
   const [isDemoTourOpen, setIsDemoTourOpen] = useState(false);
   const [isLinkedInModalOpen, setIsLinkedInModalOpen] = useState(false);
 
+  // Decision System of Record Modals State
+  const [isDecisionCaptureOpen, setIsDecisionCaptureOpen] = useState(false);
+  const [isDecisionLogOpen, setIsDecisionLogOpen] = useState(false);
+  const [activeRiskForDecision, setActiveRiskForDecision] = useState<CriticalRiskItem | null>(null);
+
   // Sync state to local storage
   useEffect(() => {
     saveProjects(projects);
@@ -163,12 +173,57 @@ export default function App() {
   }, [orgRequests]);
 
   useEffect(() => {
+    saveExecutiveDecisions(executiveDecisions);
+  }, [executiveDecisions]);
+
+  useEffect(() => {
     localStorage.setItem('prosync_sidebar_collapsed', String(isSidebarCollapsed));
   }, [isSidebarCollapsed]);
 
   useEffect(() => {
     localStorage.setItem('prosync_logo_variant', logoVariant);
   }, [logoVariant]);
+
+  // Decision Handlers
+  const handleOpenCaptureDecision = (riskItem: CriticalRiskItem) => {
+    setActiveRiskForDecision(riskItem);
+    setIsDecisionCaptureOpen(true);
+  };
+
+  const handleConfirmDecision = (newDecision: ExecutiveDecisionRecord) => {
+    setExecutiveDecisions((prev) => [newDecision, ...prev]);
+
+    // If budget addition was approved, update the project totalBudget
+    if (newDecision.approvedAmount && newDecision.approvedAmount > 0) {
+      setProjects((prev) =>
+        prev.map((p) => {
+          if (p.id === newDecision.projectId) {
+            return {
+              ...p,
+              totalBudget: p.totalBudget + (newDecision.approvedAmount || 0),
+            };
+          }
+          return p;
+        })
+      );
+    }
+  };
+
+  const handleUpdateActionStatus = (decisionId: string, actionId: string, newStatus: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED') => {
+    setExecutiveDecisions((prev) =>
+      prev.map((d) => {
+        if (d.id === decisionId) {
+          return {
+            ...d,
+            actionItems: d.actionItems.map((item) =>
+              item.id === actionId ? { ...item, status: newStatus } : item
+            ),
+          };
+        }
+        return d;
+      })
+    );
+  };
 
   // Handler for adding a new project
   const handleAddProject = (newProject: Project) => {
@@ -441,6 +496,8 @@ export default function App() {
         pendingApprovalsCount={pendingApprovalsCount}
         onOpenApprovalGateway={() => setIsApprovalGatewayOpen(true)}
         onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
+        onOpenSystemOfRecord={() => setIsDecisionLogOpen(true)}
+        decisionsCount={executiveDecisions.length}
       />
 
       {/* Main Container Area */}
@@ -462,6 +519,8 @@ export default function App() {
           onOpenApprovalGateway={() => setIsApprovalGatewayOpen(true)}
           onOpenDemoTour={() => setIsDemoTourOpen(true)}
           onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
+          onOpenSystemOfRecord={() => setIsDecisionLogOpen(true)}
+          decisionsCount={executiveDecisions.length}
         />
 
         {/* Scrollable View Content */}
@@ -486,6 +545,7 @@ export default function App() {
               <ExecutiveDashboard
                 projects={displayProjects}
                 briefing={displayBriefing}
+                decisions={executiveDecisions}
                 onUpdateBriefing={setExecutiveBriefing}
                 onSelectProject={(id) => setSelectedProjectId(id)}
                 onOpenLogUpdate={(p) => setUpdatingProject(p)}
@@ -493,14 +553,20 @@ export default function App() {
                 onReviewMilestoneRequest={handleReviewMilestoneRequest}
                 onOpenApprovalGateway={() => setIsApprovalGatewayOpen(true)}
                 onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
+                onOpenCaptureDecision={handleOpenCaptureDecision}
+                onOpenSystemOfRecord={() => setIsDecisionLogOpen(true)}
+                onOpenAIQA={() => setIsQAOpen(true)}
               />
             ) : (
               <ProjectList
+                currentRole={currentRole}
                 projects={displayProjects}
                 onSelectProject={(id) => setSelectedProjectId(id)}
                 onOpenLogUpdate={(p) => setUpdatingProject(p)}
                 onOpenAddProject={() => setIsAddProjectOpen(true)}
                 onOpenEditProject={(p) => setEditingProject(p)}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenApprovalGateway={() => setIsApprovalGatewayOpen(true)}
               />
             )}
           </div>
@@ -618,6 +684,20 @@ export default function App() {
         onClose={() => setIsLinkedInModalOpen(false)}
         projects={projects}
         briefing={executiveBriefing}
+      />
+
+      <DecisionCaptureModal
+        isOpen={isDecisionCaptureOpen}
+        riskItem={activeRiskForDecision}
+        onClose={() => setIsDecisionCaptureOpen(false)}
+        onConfirmDecision={handleConfirmDecision}
+      />
+
+      <DecisionSystemOfRecordModal
+        isOpen={isDecisionLogOpen}
+        decisions={executiveDecisions}
+        onClose={() => setIsDecisionLogOpen(false)}
+        onUpdateActionStatus={handleUpdateActionStatus}
       />
 
     </div>

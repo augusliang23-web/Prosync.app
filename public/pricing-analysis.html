@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProSync Enterprise AI - 商業定價模型、成本結構與目標利潤試算報告</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js for Interactive Financial Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f3ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+              950: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0b0f19;
+      color: #f1f5f9;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -10px rgba(99, 102, 241, 0.15);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-16">
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-8 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-emerald-500/20">
+          <i data-lucide="dollar-sign" class="w-6 h-6 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-white tracking-tight">ProSync Enterprise AI</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              Pricing & Margin Analysis
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">商業定價模型、COGS 成本結構與可調淨利潤反推定價分析</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <a href="/architecture.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-500/30 transition-all">
+          <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
+          <span>檢視系統架構圖 (.html)</span>
+        </a>
+        <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all cursor-pointer">
+          <i data-lucide="printer" class="w-4 h-4 text-slate-400"></i>
+          <span>列印 / 匯出 PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-8 mt-8 space-y-8">
+
+    <!-- Executive Summary Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+          <span>高毛利 B2B Enterprise SaaS 財務策略</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          目標淨利潤率導向與競品替代價格反推定價模型
+        </h2>
+        <p class="text-sm text-slate-300 max-w-3xl leading-relaxed">
+          ProSync 憑藉 Gemini 3.6 Flash 的低 Token 成本，將邊際銷貨成本（COGS）控制在單客戶 <strong class="text-emerald-400 font-bold">$15 ~ $50 USD/月</strong>。你可以透過下方工具自由調整<strong class="text-amber-300">「目標淨利潤率 %」</strong>或<strong class="text-amber-300">「每月目標純利 $」</strong>，系統將自動為你倒推計算最具競爭力的三階訂閱定價！
+        </p>
+
+        <!-- Key Financial Metrics Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-800/80">
+          <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-medium">基本邊際毛利率 (Gross Margin)</span>
+            <div class="text-2xl font-black text-emerald-400 font-mono mt-1">89.2 %</div>
+            <span class="text-[11px] text-emerald-300/80 mt-0.5 block">扣除 Token & Server COGS</span>
+          </div>
+          <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-medium">建議黃金營運淨利率</span>
+            <div class="text-2xl font-black text-indigo-400 font-mono mt-1">50.0 % - 65.0 %</div>
+            <span class="text-[11px] text-indigo-300/80 mt-0.5 block">兼顧競品價格殺傷力與研發現金流</span>
+          </div>
+          <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-medium">CAC 回收期 (Payback Period)</span>
+            <div class="text-2xl font-black text-purple-400 font-mono mt-1">1.8 個月</div>
+            <span class="text-[11px] text-purple-300/80 mt-0.5 block">不到 2 個月即可轉為純淨利</span>
+          </div>
+          <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-medium">高管均攤效益 (Per User/Day)</span>
+            <div class="text-2xl font-black text-amber-400 font-mono mt-1">&lt; $0.60 USD</div>
+            <span class="text-[11px] text-amber-300/80 mt-0.5 block">不到一杯咖啡價格，極具競爭力</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive Section: Dynamic Target Net Profit & Competitive Pricing Engine -->
+    <section class="glass-card rounded-3xl p-6 sm:p-8 space-y-6 border-2 border-emerald-500/40 relative bg-gradient-to-b from-slate-900 via-slate-900/90 to-slate-950">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <i data-lucide="sliders" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-white">開放試算：調整你的目標淨利潤 (Target Net Profit Calculator)</h3>
+            <p class="text-xs text-slate-400">自由調高/調低預期淨利潤率，自動倒推最吸引企業採購的方案定價與競爭力評估</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            即時反推定價模式 (Reverse Pricing Engine)
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-2">
+        
+        <!-- Controls Column -->
+        <div class="lg:col-span-5 space-y-6 bg-slate-950/90 p-6 rounded-2xl border border-slate-800">
+          
+          <!-- Slider A: Target Net Profit Margin % -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-emerald-300 font-bold flex items-center gap-1.5">
+                <i data-lucide="percent" class="w-4 h-4"></i>
+                1. 目標營運淨利潤率 (Target Net Margin %):
+              </span>
+              <span id="targetMarginVal" class="font-mono text-emerald-400 font-black text-base">55.0 %</span>
+            </div>
+            <input type="range" id="sliderTargetMargin" min="20" max="85" value="55" step="5" class="w-full accent-emerald-500 cursor-pointer">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>20% (平價快攻市佔)</span>
+              <span>55% (建議黃金定價)</span>
+              <span>85% (高階利基暴利)</span>
+            </div>
+          </div>
+
+          <!-- Slider B: Monthly OpEx (固定研發/行銷營運開銷) -->
+          <div class="space-y-2 pt-3 border-t border-slate-800">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-300 font-bold flex items-center gap-1.5">
+                <i data-lucide="building-2" class="w-4 h-4 text-indigo-400"></i>
+                2. 預估每月營運團隊開銷 (Monthly OpEx):
+              </span>
+              <span id="targetOpExVal" class="font-mono text-indigo-400 font-bold text-sm">$12,000 USD</span>
+            </div>
+            <input type="range" id="sliderTargetOpEx" min="3000" max="60000" value="12000" step="1000" class="w-full accent-indigo-500 cursor-pointer">
+            <span class="text-[11px] text-slate-400 block">包含 PM、工程師薪資、伺服器固定費與行銷投放</span>
+          </div>
+
+          <!-- Slider C: Customer Portfolio Scale (客戶規模組合) -->
+          <div class="space-y-2 pt-3 border-t border-slate-800">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-300 font-bold flex items-center gap-1.5">
+                <i data-lucide="users" class="w-4 h-4 text-purple-400"></i>
+                3. 預期付費客戶數總和 (Active Client Scale):
+              </span>
+              <span id="targetClientsVal" class="font-mono text-purple-300 font-bold text-sm">50 家企業</span>
+            </div>
+            <input type="range" id="sliderTargetClients" min="10" max="300" value="50" step="5" class="w-full accent-purple-500 cursor-pointer">
+            <div class="text-[11px] text-slate-400 flex justify-between">
+              <span>(預設結構: 30% Team, 60% Biz, 10% Custom)</span>
+            </div>
+          </div>
+
+          <!-- Strategy Insight Box based on Slider -->
+          <div id="strategyRecommendationBox" class="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xs space-y-2">
+            <!-- Dynamic Injection via JS -->
+          </div>
+
+        </div>
+
+        <!-- Calculated Output & Competitive Benchmark Column -->
+        <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+          
+          <!-- Reverse Calculated Pricing Cards -->
+          <div>
+            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+              根據「<span id="outMarginPercent">55.0%</span> 淨利潤率」自動反推的建議競品方案定價：
+            </h4>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              
+              <!-- Tier 1 Pro Card -->
+              <div class="bg-slate-950/90 p-4 rounded-2xl border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-[11px] font-bold text-slate-400">Team Pro (團隊)</span>
+                  <span class="text-[10px] text-slate-500">10-30人</span>
+                </div>
+                <div id="tierProPrice" class="text-2xl font-black text-white font-mono">$249</div>
+                <div class="text-[10px] text-slate-400">USD / 月 (年繳折算)</div>
+                <div id="tierProBench" class="text-[10px] text-emerald-400 font-semibold pt-1 border-t border-slate-800">
+                  均攤 ~$0.27 / 人 / 天
+                </div>
+              </div>
+
+              <!-- Tier 2 Business Card (Featured) -->
+              <div class="bg-indigo-950/40 p-4 rounded-2xl border-2 border-indigo-500/60 space-y-2 relative">
+                <span class="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full text-[9px] font-bold bg-indigo-500 text-white">
+                  主力推薦
+                </span>
+                <div class="flex justify-between items-center">
+                  <span class="text-[11px] font-bold text-indigo-300">Business (企業版)</span>
+                  <span class="text-[10px] text-indigo-300">30-150人</span>
+                </div>
+                <div id="tierBizPrice" class="text-2xl font-black text-white font-mono">$799</div>
+                <div class="text-[10px] text-indigo-200/70">USD / 月 (年繳折算)</div>
+                <div id="tierBizBench" class="text-[10px] text-emerald-300 font-semibold pt-1 border-t border-indigo-500/20">
+                  均攤 ~$0.53 / 人 / 天
+                </div>
+              </div>
+
+              <!-- Tier 3 Custom Card -->
+              <div class="bg-slate-950/90 p-4 rounded-2xl border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-[11px] font-bold text-purple-300">Custom (旗艦版)</span>
+                  <span class="text-[10px] text-slate-500">150+人</span>
+                </div>
+                <div id="tierCustomPrice" class="text-2xl font-black text-white font-mono">$2,199</div>
+                <div class="text-[10px] text-slate-400">USD / 月起</div>
+                <div id="tierCustomBench" class="text-[10px] text-purple-300 font-semibold pt-1 border-t border-slate-800">
+                  專屬 VPC + SLA 99.9%
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Total Monthly Revenue & Net Profit Display -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800">
+              <span class="text-[11px] text-slate-400">所需月總營收 (MRR)</span>
+              <div id="calcMRR" class="text-xl font-bold text-white font-mono mt-0.5">$36,800</div>
+            </div>
+            <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800">
+              <span class="text-[11px] text-slate-400">預估月總 COGS 成本</span>
+              <div id="calcCOGS" class="text-xl font-bold text-rose-400 font-mono mt-0.5">$2,350</div>
+            </div>
+            <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 col-span-2 sm:col-span-1">
+              <span class="text-[11px] text-slate-400">實現每月純淨利 (Net Profit)</span>
+              <div id="calcNetProfit" class="text-xl font-bold text-emerald-400 font-mono mt-0.5">$22,450</div>
+            </div>
+          </div>
+
+          <!-- Competitive Benchmark Matrix -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
+            <h5 class="text-xs font-bold text-white flex items-center justify-between">
+              <span>與傳統與競品 Enterprise PM 工具競爭力對比：</span>
+              <span id="competitiveVerdict" class="text-[11px] font-mono text-emerald-400 font-bold">優異 CP 值競爭力</span>
+            </h5>
+            <div class="grid grid-cols-3 gap-2 text-[11px] text-center font-mono">
+              <div class="p-2 bg-slate-900 rounded-xl border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Atlassian Jira Ent.</span>
+                <strong class="text-slate-300">$14.50 / 人 / 月</strong>
+              </div>
+              <div class="p-2 bg-slate-900 rounded-xl border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Monday.com Ent.</span>
+                <strong class="text-slate-300">$24.00 / 人 / 月</strong>
+              </div>
+              <div class="p-2 bg-indigo-950/60 rounded-xl border border-indigo-500/40">
+                <span class="text-indigo-300 block text-[10px]">ProSync AI (人均折算)</span>
+                <strong id="prosyncPerSeat" class="text-emerald-400">$8.99 / 人 / 月</strong>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 1: Three-Tier Pricing Strategy Details -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="tag" class="w-5 h-5 text-indigo-400"></i>
+          <h3 class="text-xl font-bold text-white">1. B2B 階梯式定價模型架構 (Tiered Pricing Model)</h3>
+        </div>
+        <span class="text-xs text-slate-400">建議採「訂閱制 (Subscription) + 按年付費 20% 折扣」</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Tier 1: Team Pro -->
+        <div class="glass-card glass-card-hover rounded-3xl p-6 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                Team Pro (團隊版)
+              </span>
+              <span class="text-xs font-mono text-slate-400">10-30 人團隊</span>
+            </div>
+            <div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-3xl font-black text-white font-mono">$299</span>
+                <span class="text-xs text-slate-400">USD / 月</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">按年繳為 $249/mo（適合新創與單一 PM 團隊）</p>
+            </div>
+            <hr class="border-slate-800">
+            <ul class="space-y-2.5 text-xs text-slate-300">
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>支援最多 <strong>5 個核心專案</strong> 週報管理</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>PM AI 週報潤飾 (Gemini Flash Pipeline)</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>基礎紅黃綠燈風險燈號與進度追蹤</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>月度上限：500 次 AI 潤飾生成</span>
+              </li>
+            </ul>
+          </div>
+          <div class="bg-slate-950/80 p-3 rounded-xl text-[11px] text-slate-400 border border-slate-800/80">
+            <strong class="text-slate-300">估計邊際 COGS:</strong> ~$12 - $18 USD / 月<br>
+            <strong class="text-emerald-400">預估邊際毛利率: 94.0%</strong>
+          </div>
+        </div>
+
+        <!-- Tier 2: Business Enterprise (Featured) -->
+        <div class="glass-card glass-card-hover rounded-3xl p-6 flex flex-col justify-between space-y-6 border-2 border-indigo-500/60 relative bg-gradient-to-b from-indigo-950/30 via-slate-900 to-slate-900">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-black bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md uppercase tracking-wider">
+            ★ 主力推薦 (Best Value)
+          </div>
+          <div class="space-y-4 pt-2">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                Business Enterprise (企業版)
+              </span>
+              <span class="text-xs font-mono text-indigo-300">30-150 人公司</span>
+            </div>
+            <div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-3xl font-black text-white font-mono">$899</span>
+                <span class="text-xs text-slate-400">USD / 月</span>
+              </div>
+              <p class="text-xs text-indigo-200/80 mt-1">按年繳為 $749/mo（中大型企業主力採購規格）</p>
+            </div>
+            <hr class="border-indigo-500/20">
+            <ul class="space-y-2.5 text-xs text-slate-200">
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>支援最多 <strong>30 個專案</strong> & 5 位 C-Suite 高管</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>全功能 <strong>C-Suite Executive Briefing</strong> 摘要生成</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span><strong>System of Record 拍板履歷 (DEC-xxx)</strong> 永久紀錄</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>C-Suite 專屬 AI 戰略問答秘書 (Grounding Context)</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>跨部門人力調配看板 + 組織卡點分析</span>
+              </li>
+            </ul>
+          </div>
+          <div class="bg-indigo-950/60 p-3 rounded-xl text-[11px] text-indigo-200 border border-indigo-500/30">
+            <strong class="text-white">估計邊際 COGS:</strong> ~$45 - $65 USD / 月<br>
+            <strong class="text-emerald-400">預估邊際毛利率: 92.7%</strong>
+          </div>
+        </div>
+
+        <!-- Tier 3: Enterprise Custom -->
+        <div class="glass-card glass-card-hover rounded-3xl p-6 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-purple-300 border border-purple-500/30">
+                Enterprise Custom (旗艦集團版)
+              </span>
+              <span class="text-xs font-mono text-slate-400">150+ 人集團/跨國公司</span>
+            </div>
+            <div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-3xl font-black text-white font-mono">$2,499+</span>
+                <span class="text-xs text-slate-400">USD / 月</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">專屬私有化託管與客製化 API 串接</p>
+            </div>
+            <hr class="border-slate-800">
+            <ul class="space-y-2.5 text-xs text-slate-300">
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span><strong>無限量專案</strong> 與全公司權限分配</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>獨立 VPC / 私有 Cloud SQL 資料庫託管</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>SAP / Oracle / Jira / Slack 自動化 Cron 串接</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>SLA 99.9% 專屬客戶成功經理 + SOC2 稽核合規報告</span>
+              </li>
+            </ul>
+          </div>
+          <div class="bg-slate-950/80 p-3 rounded-xl text-[11px] text-slate-400 border border-slate-800/80">
+            <strong class="text-slate-300">估計邊際 COGS:</strong> ~$180 - $280 USD / 月<br>
+            <strong class="text-emerald-400">預估邊際毛利率: 88.8%</strong>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 2: Detailed Cost Structure (COGS Analysis) -->
+    <section class="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="cpu" class="w-5 h-5 text-emerald-400"></i>
+          <h3 class="text-xl font-bold text-white">2. 細化銷貨成本結構 (COGS Breakdown)</h3>
+        </div>
+        <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+          以單一 Business Enterprise 客戶 ($899/mo) 實測推算
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Table Breakdown -->
+        <div class="lg:col-span-8 overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900 text-slate-300 font-bold border-b border-slate-800">
+              <tr>
+                <th class="p-3">成本項目 (Cost Component)</th>
+                <th class="p-3">規格與用量基準</th>
+                <th class="p-3">單價 (Unit Price)</th>
+                <th class="p-3 text-right">預估月成本 (USD)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/80 text-slate-300 font-mono">
+              <tr>
+                <td class="p-3 font-semibold text-indigo-300">
+                  Gemini 3.6 Flash LLM API
+                </td>
+                <td class="p-3 font-sans text-slate-400">
+                  ~150k Input / 25k Output Tokens / 天 (Executive Briefing & QA)
+                </td>
+                <td class="p-3 font-sans text-slate-400">
+                  $0.075 / 1M In, $0.30 / 1M Out
+                </td>
+                <td class="p-3 text-right text-emerald-400 font-bold">$12.40</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-indigo-300">
+                  Cloud Run Application Hosting
+                </td>
+                <td class="p-3 font-sans text-slate-400">
+                  Node.js Express Serverless (按 CPU/RAM 執行秒數與流量)
+                </td>
+                <td class="p-3 font-sans text-slate-400">
+                  $0.00002400 / vCPU-sec
+                </td>
+                <td class="p-3 text-right text-emerald-400 font-bold">$18.50</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-indigo-300">
+                  Cloud SQL / Firestore Persistence
+                </td>
+                <td class="p-3 font-sans text-slate-400">
+                  拍板履歷 (DEC-xxx)、組織卡點與專案關聯資料庫
+                </td>
+                <td class="p-3 font-sans text-slate-400">
+                  Storage & Read/Write IO
+                </td>
+                <td class="p-3 text-right text-emerald-400 font-bold">$15.00</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-indigo-300">
+                  SSO & External APIs
+                </td>
+                <td class="p-3 font-sans text-slate-400">
+                  Google Workspace OAuth / Resend Email Webhooks
+                </td>
+                <td class="p-3 font-sans text-slate-400">
+                  Per MAU / API Call
+                </td>
+                <td class="p-3 text-right text-emerald-400 font-bold">$4.10</td>
+              </tr>
+              <tr class="bg-slate-900/80 font-bold text-white">
+                <td class="p-3 font-sans text-emerald-400" colspan="3">
+                  總 COGS 成本 (Total Cost of Goods Sold) / 客戶 / 月
+                </td>
+                <td class="p-3 text-right text-emerald-400 text-sm">$50.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- COGS Visual Doughnut Chart -->
+        <div class="lg:col-span-4 bg-slate-950/80 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+          <div>
+            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">COGS 成本結構占比</h4>
+            <div class="h-48 relative flex items-center justify-center">
+              <canvas id="cogsChart"></canvas>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 space-y-1">
+            <div class="flex justify-between">
+              <span>每客戶營收:</span>
+              <strong class="text-white font-mono">$899.00 USD</strong>
+            </div>
+            <div class="flex justify-between">
+              <span>每客戶毛利 (Gross Profit):</span>
+              <strong class="text-emerald-400 font-mono">$849.00 USD</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 3: Strategic Advantages & Defensive Moat -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <div class="glass-card rounded-3xl p-6 space-y-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-5 h-5 text-indigo-400"></i>
+          <h3 class="text-lg font-bold text-white">3. 商業模式防禦壁壘 (Strategic Moat)</h3>
+        </div>
+        <ul class="space-y-3 text-xs text-slate-300 leading-relaxed">
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-md bg-indigo-500/20 text-indigo-300 font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+            <div>
+              <strong class="text-white block font-semibold mb-0.5">高切換成本 (High Switching Cost - System of Record)</strong>
+              一旦 CEO 與 C-Suite 高管將拍板決策履歷 (DEC-xxx) 寫入 ProSync，其作為企業歷史審計與跨部門究責的核心依據，客戶幾乎不可能更換廠商。
+            </div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-md bg-indigo-500/20 text-indigo-300 font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+            <div>
+              <strong class="text-white block font-semibold mb-0.5">極優異的 LLM 長上下文 CP 值 (Gemini 3.6 Flash)</strong>
+              相較於競品使用 GPT-4o 或 Claude 3.5 Sonnet（每百萬 Token 成本高出 5 至 10 倍），ProSync 能以超低 COGS 提供更快速且大規模的全專案檢視。
+            </div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-md bg-indigo-500/20 text-indigo-300 font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+            <div>
+              <strong class="text-white block font-semibold mb-0.5">痛點直接對準 C-Suite（高付費意願）</strong>
+              傳統 PM 工具（Jira/Trello）解決 PM 痛點，定價難以推升；ProSync 解決 CEO「資訊不對稱與被動背鍋」痛點，每年省下數萬小時高管會議成本，定價權極高。
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="glass-card rounded-3xl p-6 space-y-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="rocket" class="w-5 h-5 text-purple-400"></i>
+          <h3 class="text-lg font-bold text-white">4. 變現與規模化演進路線 (Monetization Roadmap)</h3>
+        </div>
+        <div class="space-y-3 text-xs text-slate-300">
+          <div class="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-1">
+            <div class="flex justify-between items-center">
+              <strong class="text-indigo-300 font-bold">Phase 1: PMF 驗證與 C-Suite 病毒擴散 (0 - 20 客戶)</strong>
+              <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">ARR ~$150K</span>
+            </div>
+            <p class="text-slate-400 leading-normal">
+              專注於 100% 滿意度與週報摘要產出質量。透過 CEO 參加董事會時展示 System of Record，帶動同業 C-Suite 口碑推薦。
+            </p>
+          </div>
+
+          <div class="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-1">
+            <div class="flex justify-between items-center">
+              <strong class="text-purple-300 font-bold">Phase 2: ERP 模組與加值外掛 (20 - 100 客戶)</strong>
+              <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">ARR ~$1.2M</span>
+            </div>
+            <p class="text-slate-400 leading-normal">
+              推出 SAP / Oracle / Jira 自動同步 Cron 插件（額外訂閱 +$300/mo Add-on），提高客戶單價並打入上市企業供應鏈。
+            </p>
+          </div>
+
+          <div class="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-1">
+            <div class="flex justify-between items-center">
+              <strong class="text-emerald-300 font-bold">Phase 3: 專屬 Fine-Tuning & 私有雲 (100+ 客戶)</strong>
+              <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">ARR ~$5.0M+</span>
+            </div>
+            <p class="text-slate-400 leading-normal">
+              針對金融業、半導體業提供私有化 Gemini On-Premise 部署與專用提示詞模型，客單價可高達 $50,000+ ARR。
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-4 sm:px-8 mt-12 text-center text-xs text-slate-500">
+    ProSync Enterprise AI Financial Model &copy; 2026. Designed for C-Suite Strategic Governance & High-Growth B2B SaaS.
+  </footer>
+
+  <!-- Interactive Scripts -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Chart 1: COGS Doughnut Chart
+    const ctxCogs = document.getElementById('cogsChart').getContext('2d');
+    const cogsChart = new Chart(ctxCogs, {
+      type: 'doughnut',
+      data: {
+        labels: ['Gemini 3.6 Flash LLM', 'Cloud Run Serverless', 'Cloud SQL DB', 'SSO / Webhooks'],
+        datasets: [{
+          data: [12.4, 18.5, 15.0, 4.1],
+          backgroundColor: ['#6366f1', '#10b981', '#a855f7', '#f59e0b'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#94a3b8',
+              font: { size: 10 }
+            }
+          }
+        },
+        cutout: '70%'
+      }
+    });
+
+    // Reverse Pricing Engine Calculation Logic
+    const sliderTargetMargin = document.getElementById('sliderTargetMargin');
+    const sliderTargetOpEx = document.getElementById('sliderTargetOpEx');
+    const sliderTargetClients = document.getElementById('sliderTargetClients');
+
+    function updateTargetPricingEngine() {
+      const targetMarginPct = parseFloat(sliderTargetMargin.value); // e.g. 55%
+      const monthlyOpEx = parseInt(sliderTargetOpEx.value);         // e.g. 12000
+      const totalClients = parseInt(sliderTargetClients.value);      // e.g. 50
+
+      document.getElementById('targetMarginVal').innerText = `${targetMarginPct.toFixed(1)} %`;
+      document.getElementById('targetOpExVal').innerText = `$${monthlyOpEx.toLocaleString()} USD`;
+      document.getElementById('targetClientsVal').innerText = `${totalClients} 家企業`;
+      document.getElementById('outMarginPercent').innerText = `${targetMarginPct.toFixed(1)}%`;
+
+      // Customer Distribution:
+      // Team Pro: 30%, Business Enterprise: 60%, Custom: 10%
+      const numTeam = Math.max(1, Math.round(totalClients * 0.3));
+      const numBiz = Math.max(1, Math.round(totalClients * 0.6));
+      const numCustom = Math.max(1, Math.round(totalClients * 0.1));
+
+      // Weighted COGS per client:
+      // Team COGS = $15, Biz COGS = $50, Custom COGS = $220
+      const totalCOGS = (numTeam * 15) + (numBiz * 50) + (numCustom * 220);
+
+      // Formula:
+      // Target Net Margin = (Net Profit) / MRR
+      // Net Profit = MRR - totalCOGS - monthlyOpEx
+      // Target Net Margin = (MRR - totalCOGS - OpEx) / MRR = 1 - (totalCOGS + OpEx) / MRR
+      // => (totalCOGS + OpEx) / MRR = 1 - TargetNetMarginRatio
+      // => MRR = (totalCOGS + OpEx) / (1 - TargetNetMarginRatio)
+
+      const targetRatio = targetMarginPct / 100.0;
+      let requiredMRR = 0;
+      if (targetRatio < 0.99) {
+        requiredMRR = (totalCOGS + monthlyOpEx) / (1.0 - targetRatio);
+      } else {
+        requiredMRR = (totalCOGS + monthlyOpEx) * 10;
+      }
+
+      const calculatedNetProfit = requiredMRR - totalCOGS - monthlyOpEx;
+
+      // Base Tier Ratios relative to Business Enterprise Tier (1.0)
+      // Team Pro ~ 0.33 x Biz, Custom ~ 2.6 x Biz
+      // MRR = (numTeam * 0.33 * BizPrice) + (numBiz * 1.0 * BizPrice) + (numCustom * 2.6 * BizPrice)
+      // BizPrice = MRR / ( (numTeam * 0.33) + (numBiz * 1.0) + (numCustom * 2.6) )
+
+      const weightedFactor = (numTeam * 0.33) + (numBiz * 1.0) + (numCustom * 2.6);
+      let calculatedBizPrice = Math.round(requiredMRR / weightedFactor);
+      let calculatedTeamPrice = Math.round(calculatedBizPrice * 0.33);
+      let calculatedCustomPrice = Math.round(calculatedBizPrice * 2.6);
+
+      // Sanity Floor Minimum
+      if (calculatedTeamPrice < 99) calculatedTeamPrice = 99;
+      if (calculatedBizPrice < 299) calculatedBizPrice = 299;
+      if (calculatedCustomPrice < 899) calculatedCustomPrice = 899;
+
+      // Update Card Displays
+      document.getElementById('tierProPrice').innerText = `$${calculatedTeamPrice.toLocaleString()}`;
+      document.getElementById('tierBizPrice').innerText = `$${calculatedBizPrice.toLocaleString()}`;
+      document.getElementById('tierCustomPrice').innerText = `$${calculatedCustomPrice.toLocaleString()}`;
+
+      document.getElementById('calcMRR').innerText = `$${Math.round(requiredMRR).toLocaleString()}`;
+      document.getElementById('calcCOGS').innerText = `$${Math.round(totalCOGS).toLocaleString()}`;
+      document.getElementById('calcNetProfit').innerText = `$${Math.round(calculatedNetProfit).toLocaleString()}`;
+
+      // Per Seat Comparison (assuming Business tier = 50 seats)
+      const perSeatVal = (calculatedBizPrice / 50).toFixed(2);
+      document.getElementById('prosyncPerSeat').innerText = `$${perSeatVal} / 人 / 月`;
+
+      // Per day bench
+      document.getElementById('tierProBench').innerText = `均攤 ~$${(calculatedTeamPrice / 20 / 30).toFixed(2)} / 人 / 天`;
+      document.getElementById('tierBizBench').innerText = `均攤 ~$${(calculatedBizPrice / 50 / 30).toFixed(2)} / 人 / 天`;
+
+      // Strategy Assessment Guidance
+      const recBox = document.getElementById('strategyRecommendationBox');
+      const verdict = document.getElementById('competitiveVerdict');
+
+      if (targetMarginPct <= 35) {
+        verdict.innerText = '🔥 爆發式掠奪市佔（極高破壞力價格）';
+        verdict.className = 'text-[11px] font-mono text-amber-400 font-bold';
+        recBox.innerHTML = `
+          <div class="flex items-center gap-1.5 font-bold text-amber-300 mb-1">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            <span>20% - 35% 早期破壞式掠奪策略 (Market Share Grab)</span>
+          </div>
+          <p class="text-slate-300 text-[11px]">
+            <strong>特點：</strong>目前 Business 方案只需 <strong class="text-white">$${calculatedBizPrice}/mo</strong>，相當於業界傳統 PM 工具人均單價的 <strong class="text-emerald-400">30% - 40%</strong>。<br>
+            <strong>建議用途：</strong>適合專案成立前 6 個月，以極致 CP 值橫掃中小型企業，快速獲取 C-Suite 名單與 50+ 企業背書。
+          </p>
+        `;
+      } else if (targetMarginPct <= 65) {
+        verdict.innerText = '💎 最佳黃金成長型定價 (建議採用)';
+        verdict.className = 'text-[11px] font-mono text-emerald-400 font-bold';
+        recBox.innerHTML = `
+          <div class="flex items-center gap-1.5 font-bold text-emerald-300 mb-1">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+            <span>40% - 65% 標準 B2B SaaS 黃金利潤策略 (Balanced Growth)</span>
+          </div>
+          <p class="text-slate-300 text-[11px]">
+            <strong>特點：</strong>Business 方案約在 <strong class="text-white">$${calculatedBizPrice}/mo</strong>，兼具強大價格吸引力（每天僅花高管半杯咖啡錢），同時每月為團隊注入 <strong class="text-emerald-400">$${Math.round(calculatedNetProfit).toLocaleString()} USD</strong> 充沛純淨利。<br>
+            <strong>建議用途：</strong>此為全球頂尖 SaaS (如 Notion, Monday) 擴張期的最佳定價模型。
+          </p>
+        `;
+      } else {
+        verdict.innerText = '👑 高階企業精品/高現金流策略';
+        verdict.className = 'text-[11px] font-mono text-purple-400 font-bold';
+        recBox.innerHTML = `
+          <div class="flex items-center gap-1.5 font-bold text-purple-300 mb-1">
+            <i data-lucide="crown" class="w-4 h-4"></i>
+            <span>70% - 85% 高階 Enterprise 利基策略 (High ACV Premium)</span>
+          </div>
+          <p class="text-slate-300 text-[11px]">
+            <strong>特點：</strong>Business 方案調升至 <strong class="text-white">$${calculatedBizPrice}/mo</strong>，專為大型上市公司與金融業量身打造。<br>
+            <strong>建議用途：</strong>適合產品功能已包含私有雲 VPC、SOC2 認證與專屬客戶成功經理時，享有極高的高管溢價。
+          </p>
+        `;
+      }
+
+      lucide.createIcons();
+    }
+
+    sliderTargetMargin.addEventListener('input', updateTargetPricingEngine);
+    sliderTargetOpEx.addEventListener('input', updateTargetPricingEngine);
+    sliderTargetClients.addEventListener('input', updateTargetPricingEngine);
+
+    // Initial Trigger
+    updateTargetPricingEngine();
+  </script>
+</body>
+</html>
