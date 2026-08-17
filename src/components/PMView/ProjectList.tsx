@@ -19,7 +19,10 @@ import {
   AlertTriangle,
   CheckCircle2,
   Users,
-  Briefcase
+  Briefcase,
+  Clock,
+  Flame,
+  Check
 } from 'lucide-react';
 
 interface ProjectListProps {
@@ -54,9 +57,25 @@ export const ProjectList: React.FC<ProjectListProps> = ({
 
   const isN1Manager = currentRole === 'N1_MANAGER';
 
+  const [quickFilingFilter, setQuickFilingFilter] = useState<'ALL' | 'NEEDS_UPDATE' | 'AT_RISK' | 'DONE'>('ALL');
+
   const filteredProjects = projects.filter((p) => {
     if (selectedDept !== 'ALL' && p.department !== selectedDept) return false;
     if (selectedStatus !== 'ALL' && p.health !== selectedStatus) return false;
+    
+    // Quick filing filter in PM Mode
+    if (quickFilingFilter === 'NEEDS_UPDATE') {
+      const today = new Date().toISOString().split('T')[0];
+      const hasRecentUpdate = p.updates && p.updates.length > 0 && p.updates[0].date === today;
+      if (hasRecentUpdate) return false;
+    } else if (quickFilingFilter === 'AT_RISK') {
+      if (p.health === 'ON_TRACK' || p.health === 'COMPLETED') return false;
+    } else if (quickFilingFilter === 'DONE') {
+      const today = new Date().toISOString().split('T')[0];
+      const hasRecentUpdate = p.updates && p.updates.length > 0 && p.updates[0].date === today;
+      if (!hasRecentUpdate) return false;
+    }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       return (
@@ -71,6 +90,11 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   const totalDeptBudget = filteredProjects.reduce((acc, p) => acc + p.totalBudget, 0);
   const totalDeptSpent = filteredProjects.reduce((acc, p) => acc + p.spentBudget, 0);
   const atRiskDeptCount = filteredProjects.filter((p) => p.health === 'AT_RISK' || p.health === 'DELAYED').length;
+  
+  // Weekly Filing Stats for PM
+  const todayStr = new Date().toISOString().split('T')[0];
+  const filedThisWeekCount = projects.filter(p => p.updates && p.updates.length > 0 && p.updates[0].date === todayStr).length;
+  const filingProgressRate = projects.length > 0 ? Math.round((filedThisWeekCount / projects.length) * 100) : 100;
 
   const formatMoneyTWD = (amount: number) => {
     if (amount >= 1000000) {
@@ -153,33 +177,110 @@ export const ProjectList: React.FC<ProjectListProps> = ({
           </div>
         </div>
       ) : (
-        <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-teal-950 border border-teal-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300 shrink-0">
-              <UserCheck className="w-5 h-5 text-teal-400" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold text-white tracking-wide">
-                  {isEn ? 'PM Execution & Status Update Workspace' : 'PM 專案經理執行與週報填寫工作區'}
-                </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-teal-500/20 text-teal-300 border border-teal-500/40">
-                  PM View
-                </span>
+        <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-teal-950 border border-teal-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-md space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300 shrink-0">
+                <UserCheck className="w-5 h-5 text-teal-400" />
               </div>
-              <p className="text-xs text-slate-300 mt-0.5">
-                {isEn ? 'Manage project deliverables, log weekly PM updates, and submit milestone change requests to N-1 managers.' : '維護專案交付里程碑、填寫每週 PM Update 與向主管通報協助或申請 CR 變更。'}
-              </p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-white tracking-wide">
+                    {isEn ? 'PM Weekly Status Center' : 'PM 專案經理週報中心與作業總覽'}
+                  </h2>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-teal-500/20 text-teal-300 border border-teal-500/40">
+                    PM Workbench
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  {isEn ? 'Log weekly achievements, request executive support, and update milestones in full focus studio.' : '點擊任一專案進入全螢幕 PM Studio，即時渲染高管週報並進行 AI 潤飾。'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenAddProject}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white shadow-sm transition-all shrink-0 cursor-pointer"
+              >
+                <Plus className="w-4 h-4 text-teal-200" />
+                <span>{isEn ? 'Create Project' : '建立新專案'}</span>
+              </button>
             </div>
           </div>
 
-          <button
-            onClick={onOpenAddProject}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white shadow-sm transition-all shrink-0 cursor-pointer"
-          >
-            <Plus className="w-4 h-4 text-teal-200" />
-            <span>{isEn ? 'Create New Project' : '建立新專案'}</span>
-          </button>
+          {/* PM Weekly Filing Progress & Quick Task Filter Bar */}
+          <div className="pt-3 border-t border-teal-500/20 grid grid-cols-1 md:grid-cols-12 gap-3 items-center text-xs">
+            {/* Left: Filing Progress Meter */}
+            <div className="md:col-span-5 bg-slate-950/60 p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-1.5 text-slate-400 text-[11px]">
+                  <Clock className="w-3.5 h-3.5 text-teal-400" />
+                  <span>{isEn ? 'Weekly Filing Progress' : '本週週報填報進度'}</span>
+                </div>
+                <div className="text-sm font-bold font-mono text-white mt-1">
+                  {filedThisWeekCount} / {projects.length} {isEn ? 'Filed' : '專案已完成'}
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-mono font-bold text-teal-400">{filingProgressRate}%</span>
+                <div className="w-24 bg-slate-800 h-2 rounded-full mt-1 overflow-hidden">
+                  <div className="bg-teal-400 h-full rounded-full transition-all" style={{ width: `${filingProgressRate}%` }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Task Filter Pills */}
+            <div className="md:col-span-7 flex items-center gap-1.5 flex-wrap">
+              <span className="text-[11px] text-slate-400 mr-1 hidden sm:inline">{isEn ? 'Quick Filter:' : '快速篩選:'}</span>
+              <button
+                onClick={() => setQuickFilingFilter('ALL')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  quickFilingFilter === 'ALL'
+                    ? 'bg-teal-500 text-slate-950'
+                    : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-white'
+                }`}
+              >
+                {isEn ? 'All Projects' : '全部專案'} ({projects.length})
+              </button>
+
+              <button
+                onClick={() => setQuickFilingFilter('NEEDS_UPDATE')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  quickFilingFilter === 'NEEDS_UPDATE'
+                    ? 'bg-amber-500 text-slate-950'
+                    : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-amber-300'
+                }`}
+              >
+                <Flame className="w-3 h-3 text-amber-400" />
+                <span>{isEn ? 'Needs Filing' : '🔥 待填報'}</span> ({projects.length - filedThisWeekCount})
+              </button>
+
+              <button
+                onClick={() => setQuickFilingFilter('AT_RISK')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  quickFilingFilter === 'AT_RISK'
+                    ? 'bg-rose-500 text-white'
+                    : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-rose-300'
+                }`}
+              >
+                <AlertTriangle className="w-3 h-3 text-rose-400" />
+                <span>{isEn ? 'At Risk' : '⚠️ 風險卡點'}</span> ({atRiskDeptCount})
+              </button>
+
+              <button
+                onClick={() => setQuickFilingFilter('DONE')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  quickFilingFilter === 'DONE'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-emerald-300'
+                }`}
+              >
+                <Check className="w-3 h-3 text-emerald-400" />
+                <span>{isEn ? 'Up to Date' : '✅ 已完成'}</span> ({filedThisWeekCount})
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -347,19 +448,20 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                     {onOpenEditProject && (
                       <button
                         onClick={() => onOpenEditProject(p)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all cursor-pointer"
-                        title={isEn ? "Edit project details, budget, progress, and milestones" : "編輯專案名稱、預算、進度與里程碑"}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-900 hover:bg-slate-800 text-teal-300 border border-slate-700 shadow-2xs transition-all cursor-pointer"
+                        title={isEn ? "Open PM Studio to configure settings and milestones" : "進入全螢幕 PM Studio 編輯專案與里程碑"}
                       >
-                        <FileEdit className="w-3.5 h-3.5" />
-                        <span>{isEn ? 'Edit' : '編輯專案'}</span>
+                        <FileEdit className="w-3.5 h-3.5 text-teal-400" />
+                        <span>{isEn ? 'Studio Edit' : '⚡ Studio 編輯'}</span>
                       </button>
                     )}
 
                     <button
                       onClick={() => onOpenLogUpdate(p)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-100 shadow-2xs transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white shadow-2xs transition-all cursor-pointer"
                     >
-                      <span>{isEn ? 'Log Update' : '填寫週報'}</span>
+                      <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                      <span>{isEn ? 'Log Weekly Update' : '✍️ 填寫週報'}</span>
                     </button>
                   </div>
 
@@ -367,7 +469,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                     onClick={() => onSelectProject(p.id)}
                     className="text-xs font-semibold text-slate-600 hover:text-indigo-600 flex items-center gap-0.5 cursor-pointer"
                   >
-                    {isEn ? 'Details & Milestones' : '里程碑查核'} <ArrowUpRight className="w-3.5 h-3.5" />
+                    {isEn ? 'Details' : '詳細'} <ArrowUpRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -419,20 +521,20 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                         {onOpenEditProject && (
                           <button
                             onClick={() => onOpenEditProject(p)}
-                            className="px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200"
+                            className="px-2.5 py-1 rounded-md text-xs font-bold bg-slate-900 hover:bg-slate-800 text-teal-300 border border-slate-700 cursor-pointer"
                           >
-                            {isEn ? 'Edit' : '編輯專案'}
+                            {isEn ? '⚡ Studio' : '⚡ Studio'}
                           </button>
                         )}
                         <button
                           onClick={() => onOpenLogUpdate(p)}
-                          className="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-100"
+                          className="px-2.5 py-1 rounded-md text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white cursor-pointer"
                         >
-                          {isEn ? 'Log' : '週報'}
+                          {isEn ? '✍️ Update' : '✍️ 週報'}
                         </button>
                         <button
                           onClick={() => onSelectProject(p.id)}
-                          className="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700"
+                          className="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
                         >
                           {isEn ? 'Milestones' : '里程碑'}
                         </button>

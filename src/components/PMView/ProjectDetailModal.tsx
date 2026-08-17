@@ -127,31 +127,19 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {onOpenEditProject && (
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenEditProject(project);
-                }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all cursor-pointer"
-              >
-                <FileEdit className="w-3.5 h-3.5" /> 編輯專案資訊
-              </button>
-            )}
-
             <button
               onClick={() => {
                 onClose();
                 onOpenLogUpdate(project);
               }}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-100 shadow-2xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white shadow-xs transition-all cursor-pointer"
             >
-              <FileEdit className="w-3.5 h-3.5" /> 填寫週報
+              <span>⚡ 進入全螢幕 PM Studio (含 AI 潤飾)</span>
             </button>
 
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>

@@ -26,15 +26,15 @@ import { DecisionCaptureModal } from './components/ExecutiveView/DecisionCapture
 import { DecisionSystemOfRecordModal } from './components/ExecutiveView/DecisionSystemOfRecordModal';
 import { ProjectList } from './components/PMView/ProjectList';
 import { ProjectDetailModal } from './components/PMView/ProjectDetailModal';
-import { PMUpdateModal } from './components/PMView/PMUpdateModal';
+import { PMProjectWorkspace } from './components/PMView/PMProjectWorkspace';
 import { AddProjectModal } from './components/PMView/AddProjectModal';
-import { EditProjectModal } from './components/PMView/EditProjectModal';
 import { OrgStructureView } from './components/OrgView/OrgStructureView';
 import { AddOrgChangeModal } from './components/OrgView/AddOrgChangeModal';
 import { LogoVariant } from './components/BrandLogo';
 import { LogoSelectorModal } from './components/LogoSelectorModal';
 import { DemoTourModal } from './components/DemoTourModal';
 import { LinkedInDMShowcaseModal } from './components/LinkedInDMShowcaseModal';
+import { PersonaBanner } from './components/common/PersonaBanner';
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>(() => getStoredProjects());
@@ -133,7 +133,8 @@ export default function App() {
     setProjects((prev) =>
       prev.map((p) => (p.id === updatedProject.id ? updatedProject : p))
     );
-    setEditingProject(null);
+    if (editingProject) setEditingProject(updatedProject);
+    if (updatingProject) setUpdatingProject(updatedProject);
   };
   const [isAddOrgRequestOpen, setIsAddOrgRequestOpen] = useState(false);
   const [preselectEmpId, setPreselectEmpId] = useState<string | undefined>(undefined);
@@ -472,6 +473,31 @@ export default function App() {
   const pendingOrgCount = orgRequests.filter((r) => r.status === 'PENDING').length;
   const pendingApprovalsCount = pendingMilestonesCount + pendingOrgCount;
 
+  // Unfiled count for PM
+  const todayStr = new Date().toISOString().split('T')[0];
+  const unfiledCount = projects.filter(
+    (p) => !p.updates || p.updates.length === 0 || p.updates[0].date !== todayStr
+  ).length;
+
+  // 1. IMMERSIVE FULL-SCREEN FOCUS STUDIO MODE
+  if (editingProject || updatingProject) {
+    return (
+      <PMProjectWorkspace
+        project={(editingProject || updatingProject)!}
+        onBack={() => {
+          setEditingProject(null);
+          setUpdatingProject(null);
+        }}
+        onSaveProject={handleSaveEditProject}
+        onSubmitPMUpdate={(projectId, update) => {
+          handleSubmitPMUpdate(projectId, update);
+        }}
+        departmentsList={departmentsList}
+        initialTab={updatingProject ? 'WEEKLY_UPDATE' : 'CORE_SETTINGS'}
+      />
+    );
+  }
+
   return (
     <div className="flex h-screen bg-slate-50 text-slate-800 font-sans overflow-hidden selection:bg-indigo-600 selection:text-white">
       
@@ -525,7 +551,18 @@ export default function App() {
 
         {/* Scrollable View Content */}
         <main className="flex-1 p-4 sm:p-6 space-y-6 overflow-y-auto bg-slate-50/60">
-          <div className="max-w-7xl mx-auto w-full">
+          <div className="max-w-7xl mx-auto w-full space-y-6">
+            
+            {/* Global Persona Identity & Target Audience Banner */}
+            {currentView !== 'ORG_STRUCTURE' && (
+              <PersonaBanner
+                currentRole={currentRole}
+                onRoleChange={setCurrentRole}
+                pendingApprovalsCount={pendingApprovalsCount}
+                unfiledCount={unfiledCount}
+              />
+            )}
+
             {currentView === 'ORG_STRUCTURE' ? (
               <OrgStructureView
                 currentRole={currentRole}
@@ -608,21 +645,6 @@ export default function App() {
         onToggleDeliverable={handleToggleDeliverable}
         onRequestMilestoneChange={handleRequestMilestoneChange}
         onReviewMilestoneRequest={handleReviewMilestoneRequest}
-      />
-
-      <PMUpdateModal
-        project={updatingProject}
-        isOpen={Boolean(updatingProject)}
-        onClose={() => setUpdatingProject(null)}
-        onSubmitUpdate={handleSubmitPMUpdate}
-      />
-
-      <EditProjectModal
-        project={editingProject}
-        isOpen={Boolean(editingProject)}
-        onClose={() => setEditingProject(null)}
-        onSaveProject={handleSaveEditProject}
-        departmentsList={departmentsList}
       />
 
       <AddProjectModal

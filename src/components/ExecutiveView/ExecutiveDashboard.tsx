@@ -454,7 +454,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             return (
               <div
                 key={project.id}
-                className="p-3.5 border border-slate-200/80 rounded-lg hover:border-slate-300 transition-all cursor-pointer bg-slate-50/20 hover:bg-white shadow-2xs flex flex-col justify-between"
+                className="p-3.5 border border-slate-200/80 rounded-xl hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer bg-slate-50/30 hover:bg-white flex flex-col justify-between"
                 onClick={() => onSelectProject(project.id)}
               >
                 <div>
@@ -470,7 +470,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                     <HealthBadge status={project.health} size="sm" />
                   </div>
 
-                  <h4 className="font-bold text-slate-800 text-xs sm:text-sm hover:text-slate-700 transition-colors line-clamp-1">
+                  <h4 className="font-bold text-slate-800 text-xs sm:text-sm hover:text-indigo-600 transition-colors line-clamp-1">
                     {project.name}
                   </h4>
 
@@ -497,34 +497,28 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                   )}
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between gap-1 flex-wrap">
-                  <div className="flex items-center gap-1.5">
-                    {onOpenEditProject && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onOpenEditProject(project);
-                        }}
-                        className="text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded border border-indigo-200 transition-all cursor-pointer"
-                        title="編輯專案名稱、預算、進度與里程碑"
-                      >
-                        ✏️ 編輯專案
-                      </button>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenLogUpdate(project);
-                      }}
-                      className="text-[11px] font-semibold text-slate-700 hover:text-slate-900"
-                    >
-                      {t('dashboard.fillWeeklyUpdate')}
-                    </button>
-                  </div>
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenLogUpdate(project);
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 px-2.5 py-1 rounded-lg border border-teal-300/80 transition-all cursor-pointer shadow-2xs"
+                    title={isEn ? "Open full-screen PM Studio for weekly filing & AI polish" : "進入全螢幕 PM Studio 填報週報與 AI 潤飾"}
+                  >
+                    <span>⚡ PM Studio</span>
+                  </button>
 
-                  <span className="text-[11px] font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-0.5">
-                    {t('dashboard.detailsAndMilestones')} <ArrowUpRight className="w-3 h-3" />
-                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectProject(project.id);
+                    }}
+                    className="text-[11px] font-semibold text-slate-600 hover:text-indigo-600 flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <span>{isEn ? 'Milestones' : '里程碑查核'}</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </button>
                 </div>
               </div>
             );

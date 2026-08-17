@@ -122,22 +122,28 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Perspective Toggle Pills */}
-        <div className="hidden sm:flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200/80 text-xs font-medium">
+        <div className="flex items-center bg-slate-200/80 p-1 rounded-xl border border-slate-300/80 text-xs font-bold shadow-2xs">
           <button
             onClick={() => onRoleChange('EXECUTIVE')}
-            className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-              currentRole === 'EXECUTIVE' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-500 hover:text-slate-900'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              currentRole === 'EXECUTIVE'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/50'
             }`}
           >
-            {t('header.executive')}
+            <span>👑</span>
+            <span>{t('header.executive')}</span>
           </button>
           <button
             onClick={() => onRoleChange('PM')}
-            className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-              currentRole === 'PM' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-500 hover:text-slate-900'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              currentRole === 'PM'
+                ? 'bg-teal-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/50'
             }`}
           >
-            {t('header.pmView')}
+            <span>✍️</span>
+            <span>{t('header.pmView')}</span>
           </button>
         </div>
 
